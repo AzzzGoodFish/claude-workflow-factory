@@ -14,8 +14,8 @@ User describes goal without providing materials. The agent should research patte
 
 <example>
 Context: User has a vague idea and needs guidance
-user: "我想做一个数据处理的工作流，但不太确定怎么设计"
-assistant: "让我调研数据处理工作流的常见模式，为你提供设计建议。"
+user: "I want to build a data processing workflow but not sure how to design it"
+assistant: "Let me research common data processing workflow patterns and provide design recommendations."
 [Calls wf-researcher agent]
 <commentary>
 User has unclear requirements. The agent researches patterns and provides structured proposals for user feedback.
@@ -79,73 +79,73 @@ Provide research results in this structure:
 type: workflow-research
 agent: wf-researcher
 timestamp: [ISO8601]
-goal: [用户目标简述]
+goal: [Brief user goal summary]
 ---
 
-## 理解的目标
+## Understood Goal
 
-**工作流类型**: [类型分类]
-**核心目标**: [目标描述]
-**范围**: [工作流边界]
+**Workflow Type**: [Category]
+**Core Objective**: [Goal description]
+**Scope**: [Workflow boundaries]
 
-## 建议的工作流方案
+## Recommended Workflow Approach
 
-### 方案概述
+### Approach Overview
 
-[整体设计思路说明]
+[Overall design approach explanation]
 
-### 建议的节点
+### Recommended Nodes
 
-| 节点名称 | 职责 | 输入 | 输出 |
-|---------|------|------|------|
-| [名称] | [职责] | [数据] | [数据] |
+| Node Name | Responsibility | Input | Output |
+|-----------|----------------|-------|--------|
+| [name] | [responsibility] | [data] | [data] |
 
-### 建议的流程
+### Recommended Flow
 
-**执行顺序:**
+**Execution Order:**
 ```
-START >> [节点序列] >> END
+START >> [node sequence] >> END
 ```
 
-**流程说明:**
-1. [步骤说明]
-2. [步骤说明]
+**Flow Description:**
+1. [Step description]
+2. [Step description]
 
-### 建议的数据契约
+### Recommended Data Contracts
 
-**[契约名称]:**
-- 用途: [说明]
-- 关键字段: [字段列表]
+**[Contract Name]:**
+- Purpose: [description]
+- Key Fields: [field list]
 
-### 错误处理策略
+### Error Handling Strategy
 
-| 错误类型 | 处理方式 |
-|---------|---------|
-| [类型] | [策略] |
+| Error Type | Handling Approach |
+|------------|-------------------|
+| [type] | [strategy] |
 
-## 设计依据
+## Design Rationale
 
-**参考的模式/实践:**
-- [模式1]: [说明]
-- [模式2]: [说明]
+**Referenced Patterns/Practices:**
+- [Pattern 1]: [description]
+- [Pattern 2]: [description]
 
-**考虑的替代方案:**
-- [方案A]: [优缺点]
-- [方案B]: [优缺点]
+**Alternative Approaches Considered:**
+- [Approach A]: [pros/cons]
+- [Approach B]: [pros/cons]
 
-## 待确认项
+## Items Requiring Confirmation
 
-请确认或调整以下设计决策：
+Please confirm or adjust the following design decisions:
 
-1. **[决策点]**: [选项说明]
-2. **[决策点]**: [选项说明]
+1. **[Decision Point]**: [Options description]
+2. **[Decision Point]**: [Options description]
 
-## 假设
+## Assumptions
 
-以下假设可能需要验证：
+The following assumptions may need verification:
 
-- [假设1]
-- [假设2]
+- [Assumption 1]
+- [Assumption 2]
 ```
 
 **Quality Standards:**

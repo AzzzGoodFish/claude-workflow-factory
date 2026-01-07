@@ -24,8 +24,8 @@ User provides a file path to requirements. The agent analyzes to extract user st
 
 <example>
 Context: User shares existing code for reference
-user: "我有一个现有的处理脚本 scripts/process.py，想基于它设计工作流"
-assistant: "我来分析这个脚本，提取工作流设计要素。"
+user: "I have an existing processing script scripts/process.py, want to design a workflow based on it"
+assistant: "Let me analyze this script to extract workflow design elements."
 [Calls wf-resource-analyzer agent]
 <commentary>
 User provides existing code as reference. The agent extracts functions, data transformations, error handling patterns.
@@ -84,64 +84,64 @@ timestamp: [ISO8601]
 source: [resource path/name]
 ---
 
-## 资料概述
+## Resource Overview
 
-**类型**: [API 文档 | 需求文档 | 流程描述 | 代码 | 数据库 Schema]
-**来源**: [文件路径或 URL]
-**摘要**: [简要描述分析了什么]
+**Type**: [API Documentation | Requirements | Process Description | Code | Database Schema]
+**Source**: [file path or URL]
+**Summary**: [Brief description of what was analyzed]
 
-## 提取的工作流要素
+## Extracted Workflow Elements
 
-### 识别的实体
+### Identified Entities
 
-| 实体 | 描述 | 建议的契约名 |
-|------|------|-------------|
-| [名称] | [说明] | [契约名] |
+| Entity | Description | Suggested Contract Name |
+|--------|-------------|------------------------|
+| [name] | [description] | [contract name] |
 
-### 识别的操作
+### Identified Operations
 
-| 操作 | 输入 | 输出 | 建议的节点名 |
-|------|------|------|-------------|
-| [操作] | [数据] | [数据] | [节点名] |
+| Operation | Input | Output | Suggested Node Name |
+|-----------|-------|--------|---------------------|
+| [operation] | [data] | [data] | [node name] |
 
-### 识别的流程
+### Identified Flow
 
-**执行顺序:**
-1. [步骤] → [节点]
-2. [步骤] → [节点]
+**Execution Order:**
+1. [step] → [node]
+2. [step] → [node]
 
-**条件分支:**
-- [条件] → [分支标签]
+**Conditional Branches:**
+- [condition] → [branch label]
 
-### 识别的数据结构
+### Identified Data Structures
 
-**[结构名称]:**
+**[Structure Name]:**
 ```yaml
 type: object
 properties:
-  [字段]:
-    type: [类型]
+  [field]:
+    type: [type]
 ```
 
-### 识别的校验规则
+### Identified Validation Rules
 
-| 规则 | 适用于 | 校验逻辑 |
-|------|--------|---------|
-| [规则名] | [实体/字段] | [逻辑描述] |
+| Rule | Applies To | Validation Logic |
+|------|------------|------------------|
+| [rule name] | [entity/field] | [logic description] |
 
-## 待确认项
+## Items Requiring Clarification
 
-需要用户澄清的问题：
+Questions requiring user clarification:
 
-1. **[主题]**: [问题]
-2. **[主题]**: [问题]
+1. **[Topic]**: [question]
+2. **[Topic]**: [question]
 
-## 建议
+## Recommendations
 
-基于分析，建议的下一步：
+Based on analysis, recommended next steps:
 
-1. [建议]
-2. [建议]
+1. [recommendation]
+2. [recommendation]
 ```
 
 **Quality Standards:**

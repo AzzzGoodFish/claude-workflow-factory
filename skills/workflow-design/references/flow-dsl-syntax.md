@@ -1,13 +1,13 @@
-# Flow DSL 完整语法参考
+# Flow DSL Complete Syntax Reference
 
-本文档提供工作流定义中使用的 Flow DSL 完整语法参考。
+This document provides a complete syntax reference for the Flow DSL used in workflow definitions.
 
-> **文档说明**：本文档基于 `cc-workflow-design.md` 第 8 章内容整理，并在以下部分进行了扩展：
-> - 条件表达式语法（详细的运算符说明）
-> - 错误处理模式（Retry/Fallback/Circuit Breaker）
-> - 最佳实践（命名规范、分组建议、错误处理建议）
+> **Document Note**: This document is based on Chapter 8 of `cc-workflow-design.md` and has been extended in the following sections:
+> - Condition expression syntax (detailed operator descriptions)
+> - Error handling patterns (Retry/Fallback/Circuit Breaker)
+> - Best practices (naming conventions, grouping recommendations, error handling recommendations)
 >
-> 扩展内容标注为 `[扩展]`。
+> Extended content is marked as `[Extended]`.
 
 ## Basic Syntax
 
@@ -284,9 +284,9 @@ Dependencies:
 | `a * $items` | `subgraph loop` + comment | Loop subgraph |
 | `a * $items[n]` | `subgraph loop[∀ item ×n]` | Parallel loop subgraph |
 
-## Condition Expression Syntax [扩展]
+## Condition Expression Syntax [Extended]
 
-> 以下运算符和字段访问语法为扩展内容，源文档仅给出简单示例。
+> The following operators and field access syntax are extended content; the source document only provides simple examples.
 
 ### Supported Operators
 
@@ -321,9 +321,9 @@ conditions:
     element: "output.items[0].valid"
 ```
 
-## Error Handling Patterns [扩展]
+## Error Handling Patterns [Extended]
 
-> 以下错误处理模式为扩展内容，基于工作流设计最佳实践补充。
+> The following error handling patterns are extended content, supplemented based on workflow design best practices.
 
 ### Retry Pattern
 
@@ -361,9 +361,9 @@ conditions:
     unhealthy: "output.error_rate > 0.5"
 ```
 
-## Best Practices [扩展]
+## Best Practices [Extended]
 
-> 以下最佳实践为扩展内容，基于工作流设计经验补充。
+> The following best practices are extended content, supplemented based on workflow design experience.
 
 ### 1. Clear Naming
 

@@ -1,62 +1,62 @@
-# Claude Code 工作流设计说明
+# Claude Code Workflow Design Guide
 
-> 本文档定义了如何将 AI 工作流设计原则映射到 Claude Code 的执行机制上。
+> This document defines how to map AI workflow design principles to Claude Code execution mechanisms.
 
-## 1. 概述
+## 1. Overview
 
-### 1.1 设计目标
+### 1.1 Design Goals
 
-将 `ai-workflow-design-principles.md` 中的 4 个核心概念映射到 Claude Code：
+Map the 4 core concepts from `ai-workflow-design-principles.md` to Claude Code:
 
-| 工作流概念 | Claude Code 机制 | 状态 |
-|-----------|-----------------|------|
-| **Contract** | YAML Schema + Python Validator | ✅ 已确定 |
-| **Nodes** | SubAgent (`.claude/agents/*.md`) | ✅ 已确定 |
-| **Flow** | 简洁 DSL (`flow.yaml`) | ✅ 已确定 |
-| **Context** | 环境变量 + 上下文文件 | ✅ 已确定 |
+| Workflow Concept | Claude Code Mechanism | Status |
+|-----------------|----------------------|--------|
+| **Contract** | YAML Schema + Python Validator | ✅ Confirmed |
+| **Nodes** | SubAgent (`.claude/agents/*.md`) | ✅ Confirmed |
+| **Flow** | Concise DSL (`flow.yaml`) | ✅ Confirmed |
+| **Context** | Environment Variables + Context Files | ✅ Confirmed |
 
-### 1.2 核心原则
+### 1.2 Core Principles
 
-1. **Command 是工作流入口和执行器**：定义整个工作流的 Flow、Input、Output
-2. **SubAgent 是节点执行器**：可选绑定 Skill，使用契约规范输入输出
-3. **SubAgent 输出格式统一为 Markdown**：存储在 `$WORKDIR/.context/`，便于 Agent 间共享
-4. **Hook 实现自动校验**：利用 Claude Code 原生 Hook 机制校验输入输出
+1. **Command is the workflow entry and executor**: Defines the entire workflow's Flow, Input, Output
+2. **SubAgent is the node executor**: Optionally binds Skills, uses contracts to standardize input/output
+3. **SubAgent output format unified as Markdown**: Stored in `$WORKDIR/.context/`, facilitating inter-Agent sharing
+4. **Hooks implement automatic validation**: Leverages Claude Code native Hook mechanism to validate input/output
 
 ---
 
-## 2. Hook 校验体系
+## 2. Hook Validation System
 
-### 2.1 Hook 类型与职责
+### 2.1 Hook Types and Responsibilities
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                     工作流执行生命周期                            │
+│                     Workflow Execution Lifecycle                 │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │  UserPromptSubmit ──────────────────────────────────────────┐   │
-│    • 校验工作流整体输入                                       │   │
-│    • 检查必要环境变量                                         │   │
-│    • 初始化工作目录                                           │   │
+│    • Validate overall workflow input                         │   │
+│    • Check required environment variables                    │   │
+│    • Initialize working directory                            │   │
 │                                                              ▼   │
 │  PreToolUse (matcher: "Task") ──────────────────────────────┐   │
-│    • 识别即将执行的 SubAgent                                 │   │
-│    • 从 Agent 定义中提取输入契约                             │   │
-│    • 校验输入文件是否符合契约                                 │   │
-│    • 校验失败 → continue: false，阻止执行                    │   │
+│    • Identify SubAgent about to execute                     │   │
+│    • Extract input contract from Agent definition           │   │
+│    • Validate input file against contract                   │   │
+│    • Validation failure → continue: false, block execution  │   │
 │                                                              ▼   │
 │  SubagentStop ──────────────────────────────────────────────┐   │
-│    • 遍历所有 Agent 的输出契约，匹配当前输出                  │   │
-│    • 匹配成功 → 写入 target 路径（.context/*.md）            │   │
-│    • 匹配失败 → continue: false，拒绝退出                    │   │
+│    • Iterate all Agent output contracts, match current output│   │
+│    • Match success → write to target path (.context/*.md)   │   │
+│    • Match failure → continue: false, reject exit           │   │
 │                                                              ▼   │
 │  Stop ──────────────────────────────────────────────────────    │
-│    • 校验工作流整体输出                                          │
-│    • 检查所有必要节点是否完成                                    │
+│    • Validate overall workflow output                           │
+│    • Check all required nodes completed                         │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### 2.2 Hook 配置
+### 2.2 Hook Configuration
 
 ```json
 // .claude/settings.json
@@ -89,11 +89,11 @@
 
 ---
 
-## 3. SubAgent 定义
+## 3. SubAgent Definition
 
-### 3.1 定义格式
+### 3.1 Definition Format
 
-SubAgent 定义文件位于 `.claude/agents/*.md`，使用扩展的 frontmatter 格式：
+SubAgent definition files are located at `.claude/agents/*.md`, using extended frontmatter format:
 
 ```markdown
 ---
@@ -101,42 +101,42 @@ name: <agent-name>
 description: <agent-description>
 tools: <Tool1, Tool2, ...>
 model: inherit
-skills: <skill-name>              # 可选，任务相关增强
+skills: <skill-name>              # Optional, task-related enhancement
 
 input:
-  contract: <ContractName>        # 输入契约名称
-  context:                        # 上下文文件列表（Agent 需要读取的）
+  contract: <ContractName>        # Input contract name
+  context:                        # Context file list (files Agent needs to read)
     - "$WORKDIR/.context/file1.md"
     - "$WORKDIR/.context/file2.md"
 
 output:
-  contract: <ContractName>        # 输出契约名称
-  target: "$WORKDIR/.context/<agent-name>.md"  # 输出目标路径
+  contract: <ContractName>        # Output contract name
+  target: "$WORKDIR/.context/<agent-name>.md"  # Output target path
 ---
 
 <Agent System Prompt>
 ```
 
-### 3.2 字段说明
+### 3.2 Field Description
 
-| 字段 | 类型 | 必须 | 说明 |
-|------|------|------|------|
-| `name` | string | ✅ | Agent 唯一标识符 |
-| `description` | string | ✅ | Agent 功能描述 |
-| `tools` | string | ✅ | 可用工具列表 |
-| `model` | string | ❌ | 模型选择（默认 inherit） |
-| `skills` | string | ❌ | 绑定的 Skill 名称 |
-| `input.contract` | string | ✅ | 输入契约名称 |
-| `input.context` | string[] | ❌ | 上下文文件路径列表 |
-| `output.contract` | string | ✅ | 输出契约名称 |
-| `output.target` | string | ✅ | 输出文件目标路径 |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | ✅ | Agent unique identifier |
+| `description` | string | ✅ | Agent function description |
+| `tools` | string | ✅ | Available tool list |
+| `model` | string | ❌ | Model selection (default inherit) |
+| `skills` | string | ❌ | Bound Skill name |
+| `input.contract` | string | ✅ | Input contract name |
+| `input.context` | string[] | ❌ | Context file path list |
+| `output.contract` | string | ✅ | Output contract name |
+| `output.target` | string | ✅ | Output file target path |
 
-### 3.3 示例
+### 3.3 Example
 
 ````markdown
 ---
 name: data-processor
-description: 处理收集的数据，生成分析结果
+description: Process collected data and generate analysis results
 tools: Read, Write, Bash, Glob
 model: inherit
 skills: data-analysis
@@ -152,23 +152,23 @@ output:
   target: "$WORKDIR/.context/processor.md"
 ---
 
-你是数据处理器。
+You are a data processor.
 
-## 任务
+## Task
 
-1. 读取上下文文件中的收集结果
-2. 分析并处理数据
-3. 按输出格式生成结果
+1. Read collection results from context files
+2. Analyze and process data
+3. Generate results in output format
 
-## 上下文
+## Context
 
-从以下文件读取：
+Read from the following files:
 - `$WORKDIR/.context/collector-a.md`
 - `$WORKDIR/.context/collector-b.md`
 
-## 输出格式
+## Output Format
 
-必须使用以下格式：
+Must use the following format:
 
 ```markdown
 ---
@@ -177,7 +177,7 @@ agent: data-processor
 timestamp: <ISO8601>
 ---
 
-## 处理结果
+## Processing Results
 
 ...
 ```
@@ -185,20 +185,20 @@ timestamp: <ISO8601>
 
 ---
 
-## 4. Contract（契约）定义
+## 4. Contract Definition
 
-### 4.1 契约文件格式
+### 4.1 Contract File Format
 
-契约使用 YAML 格式定义，包含 JSON Schema 和校验器引用：
+Contracts are defined in YAML format, containing JSON Schema and validator references:
 
 ```yaml
 # .claude/workflows/<workflow-name>/contracts/<contract-name>.yaml
 
 name: ProcessorOutput
-description: 数据处理器输出契约
+description: Data processor output contract
 version: "1.0"
 
-# JSON Schema 定义
+# JSON Schema definition
 schema:
   type: object
   required:
@@ -212,7 +212,7 @@ schema:
         - agent
       properties:
         type:
-          const: "processor-output"    # 唯一标识，用于匹配
+          const: "processor-output"    # Unique identifier for matching
         agent:
           const: "data-processor"
         timestamp:
@@ -222,31 +222,31 @@ schema:
       type: string
       minLength: 1
 
-# Python 校验器入口
+# Python validator entry point
 validator: validators/processor_output.py::validate
 
-# 示例数据
+# Example data
 examples:
   - path: examples/processor-output-sample.md
 ```
 
-### 4.2 契约唯一性
+### 4.2 Contract Uniqueness
 
-为确保 SubagentStop 能正确匹配输出到契约，每个输出契约必须有**唯一标识符**：
+To ensure SubagentStop can correctly match output to contract, each output contract must have a **unique identifier**:
 
 ```yaml
-# 在 schema 中定义唯一标识
+# Define unique identifier in schema
 schema:
   properties:
     header:
       properties:
         type:
-          const: "processor-output"    # 每个契约的 type 必须唯一
+          const: "processor-output"    # Each contract's type must be unique
         agent:
-          const: "data-processor"      # 对应的 Agent 名称
+          const: "data-processor"      # Corresponding Agent name
 ```
 
-对应的 Markdown 输出必须包含 frontmatter：
+Corresponding Markdown output must contain frontmatter:
 
 ```markdown
 ---
@@ -255,11 +255,11 @@ agent: data-processor
 timestamp: 2026-01-06T10:00:00Z
 ---
 
-## 处理结果
+## Processing Results
 ...
 ```
 
-### 4.3 校验器实现
+### 4.3 Validator Implementation
 
 ```python
 # .claude/workflows/<workflow-name>/validators/processor_output.py
@@ -279,7 +279,7 @@ class ProcessorOutput(BaseModel):
 
 def validate(data: dict) -> tuple[bool, list[str]]:
     """
-    校验输出数据
+    Validate output data
 
     Returns:
         (is_valid, error_messages)
@@ -293,46 +293,46 @@ def validate(data: dict) -> tuple[bool, list[str]]:
 
 ---
 
-## 5. 输出格式规范
+## 5. Output Format Specification
 
-### 5.1 Markdown 输出结构
+### 5.1 Markdown Output Structure
 
-所有 SubAgent 输出统一使用 Markdown 格式，必须包含 frontmatter：
+All SubAgent outputs use unified Markdown format, must contain frontmatter:
 
 ```markdown
 ---
-type: <contract-type>           # 契约类型标识（必须）
-agent: <agent-name>             # Agent 名称（必须）
-timestamp: <ISO8601>            # 时间戳（建议）
+type: <contract-type>           # Contract type identifier (required)
+agent: <agent-name>             # Agent name (required)
+timestamp: <ISO8601>            # Timestamp (recommended)
 ---
 
-## 标题
+## Title
 
-正文内容...
+Body content...
 ```
 
-### 5.2 存储位置
+### 5.2 Storage Location
 
 ```
 $WORKDIR/
-└── .context/                   # 中间输出目录
-    ├── collector-a.md          # 各 Agent 的输出
+└── .context/                   # Intermediate output directory
+    ├── collector-a.md          # Each Agent's output
     ├── collector-b.md
     ├── processor.md
     └── finalizer.md
 ```
 
-### 5.3 SubagentStop 匹配流程
+### 5.3 SubagentStop Matching Flow
 
 ```python
 def match_output_to_agent(output: str) -> Optional[AgentDef]:
     """
-    遍历所有 Agent 的输出契约，找到匹配的
+    Iterate all Agent output contracts to find match
 
-    1. 解析输出的 frontmatter
-    2. 遍历 .claude/agents/*.md
-    3. 对每个 Agent 的 output.contract，检查是否匹配
-    4. 返回匹配的 Agent 定义，或 None
+    1. Parse output frontmatter
+    2. Iterate .claude/agents/*.md
+    3. For each Agent's output.contract, check if matches
+    4. Return matching Agent definition, or None
     """
     frontmatter = parse_frontmatter(output)
     if not frontmatter:
@@ -353,23 +353,23 @@ def match_output_to_agent(output: str) -> Optional[AgentDef]:
 
 ---
 
-## 6. 目录结构
+## 6. Directory Structure
 
 ```
 .claude/
-├── settings.json                    # Hook 配置
+├── settings.json                    # Hook configuration
 │
 ├── commands/
-│   └── <workflow-name>.md           # 工作流入口 Command
+│   └── <workflow-name>.md           # Workflow entry Command
 │
 ├── agents/
-│   ├── collector-a.md               # SubAgent 定义
+│   ├── collector-a.md               # SubAgent definitions
 │   ├── collector-b.md
 │   ├── processor.md
 │   └── finalizer.md
 │
 ├── skills/
-│   └── <skill-name>/                # 解决特定任务的 Skill（可选）
+│   └── <skill-name>/                # Skills for specific tasks (optional)
 │       ├── SKILL.md
 │       └── references/
 │
@@ -381,69 +381,69 @@ def match_output_to_agent(output: str) -> Optional[AgentDef]:
 │
 └── workflows/
     └── <workflow-name>/
-        ├── flow.yaml                # Flow 定义（简洁 DSL）
-        ├── contracts/               # 契约定义
+        ├── flow.yaml                # Flow definition (concise DSL)
+        ├── contracts/               # Contract definitions
         │   ├── workflow-input.yaml
         │   ├── collector-a-output.yaml
         │   ├── processor-output.yaml
         │   └── workflow-output.yaml
-        ├── validators/              # Python 校验器
+        ├── validators/              # Python validators
         │   ├── __init__.py
         │   └── validators.py
-        └── templates/               # 输出模板（可选）
+        └── templates/               # Output templates (optional)
             ├── collector-output.md
             └── processor-output.md
 ```
 
 ---
 
-## 7. Skill 与契约的关系
+## 7. Skill and Contract Relationship
 
-### 7.1 职责区分
+### 7.1 Responsibility Distinction
 
-| 概念 | 职责 | 与 Agent 关系 |
-|------|------|--------------|
-| **Skill** | 任务增强，提供领域知识、参考文档、工具脚本 | 可选绑定，协助完成任务 |
-| **Contract** | 数据规范，定义输入输出结构和校验规则 | 必须绑定，定义接口 |
+| Concept | Responsibility | Relationship with Agent |
+|---------|---------------|------------------------|
+| **Skill** | Task enhancement, provides domain knowledge, reference docs, tool scripts | Optional binding, assists in completing tasks |
+| **Contract** | Data specification, defines input/output structure and validation rules | Required binding, defines interface |
 
-### 7.2 Skill 结构
+### 7.2 Skill Structure
 
 ```
 .claude/skills/<skill-name>/
-├── SKILL.md                    # Skill 入口
-├── references/                 # 领域知识（可选）
+├── SKILL.md                    # Skill entry
+├── references/                 # Domain knowledge (optional)
 │   └── domain-guide.md
-└── scripts/                    # 工具脚本（可选）
+└── scripts/                    # Tool scripts (optional)
     └── utils.py
 ```
 
-### 7.3 使用方式
+### 7.3 Usage
 
-- Agent 通过 `skills: <skill-name>` 引用 Skill
-- Skill 提供的知识被注入到 Agent 的上下文中
-- Skill 与契约无直接关系，契约在 Agent 定义中声明
+- Agent references Skill through `skills: <skill-name>`
+- Knowledge provided by Skill is injected into Agent's context
+- Skills have no direct relationship with contracts, contracts are declared in Agent definition
 
 ---
 
-## 8. Flow 表达规范
+## 8. Flow Expression Specification
 
-> 详细的 Flow DSL 语法请参考 `flow-dsl-syntax.md`。
+> For detailed Flow DSL syntax, see `flow-dsl-syntax.md`.
 
-### 8.1 简洁 DSL 语法
+### 8.1 Concise DSL Syntax
 
-Flow 使用简洁的 DSL 语法定义，存储在 `flow.yaml` 文件中：
+Flow uses concise DSL syntax, stored in `flow.yaml` file:
 
 ```yaml
 # .claude/workflows/<workflow-name>/flow.yaml
 name: my-workflow
 version: "1.0"
 
-# 状态定义（可选）
+# State definition (optional)
 state:
   items: []
   result: null
 
-# 流程定义
+# Flow definition
 flow: |
   START >> fetch-data >> [validate, transform] >> process >> END
   process ?success >> finalize >> END
@@ -451,122 +451,122 @@ flow: |
   process ?fail >> error-handler >> END
   batch-processor * $items[3] >> merge >> END
 
-# 条件定义（复杂条件时使用）
+# Condition definitions (for complex conditions)
 conditions:
   process:
     success: "output.status == 'ok'"
     retry: "output.retry_count < 3"
     fail: "output.status == 'error'"
 
-# 执行配置
+# Execution configuration
 execution:
   max_parallel: 3
   timeout: 3600
 ```
 
-### 8.2 语法符号
+### 8.2 Syntax Symbols
 
-| 符号 | 含义 | 示例 | 说明 |
-|------|------|------|------|
-| `>>` | 顺序依赖 | `a >> b >> c` | a 完成后执行 b，b 完成后执行 c |
-| `[a, b]` | 并行组 | `x >> [a, b] >> y` | a 和 b 并行执行，全部完成后执行 y |
-| `?label` | 条件分支 | `a ?ok >> b` | a 输出满足 ok 条件时执行 b |
-| `* $var` | 循环迭代 | `a * $items` | 对 $items 中每个元素执行 a |
-| `* $var[n]` | 并行循环 | `a * $items[3]` | 并行度为 3 的循环迭代 |
-| `START` | 起始节点 | `START >> a` | 工作流入口 |
-| `END` | 结束节点 | `a >> END` | 工作流出口 |
+| Symbol | Meaning | Example | Description |
+|--------|---------|---------|-------------|
+| `>>` | Sequential dependency | `a >> b >> c` | a completes, then b, then c |
+| `[a, b]` | Parallel group | `x >> [a, b] >> y` | a and b execute in parallel, y waits for all |
+| `?label` | Conditional branch | `a ?ok >> b` | Execute b when a output satisfies ok condition |
+| `* $var` | Loop iteration | `a * $items` | Execute a for each item in $items |
+| `* $var[n]` | Parallel loop | `a * $items[3]` | Parallel iteration with degree 3 |
+| `START` | Entry point | `START >> a` | Workflow entry |
+| `END` | Exit point | `a >> END` | Workflow exit |
 
-### 8.3 三种输出格式
+### 8.3 Three Output Formats
 
-Flow 定义可自动转换为三种格式，便于不同场景使用：
+Flow definitions can automatically convert to three formats for different scenarios:
 
-1. **Mermaid 图**：可视化
-2. **结构化文本**：智能体理解
-3. **DAG JSON**：程序处理
+1. **Mermaid Diagram**: Visualization
+2. **Structured Text**: Agent understanding
+3. **DAG JSON**: Programmatic processing
 
-详见 `flow-dsl-syntax.md`。
-
----
-
-## 9. 待定内容
-
-> 以下内容尚未完成讨论，需要后续确定。
-
-### 9.1 🔖 重试机制
-
-**问题**：SubagentStop 校验失败后，如何控制重试？
-
-**待讨论**：
-- 最大重试次数如何配置？
-- 重试时是否传递错误反馈？
-- 达到最大重试后如何处理（跳过/终止）？
-
-### 9.2 🔖 状态持久化
-
-**问题**：工作流中断后如何恢复？
-
-**待讨论**：
-- 状态文件格式和位置
-- 检查点保存时机
-- 恢复命令设计
-
-### 9.3 🔖 超时处理
-
-**问题**：SubAgent 执行时间过长如何处理？
-
-**待讨论**：
-- 超时配置位置（Agent 定义 / 全局配置）
-- 超时后的处理策略
+See `flow-dsl-syntax.md` for details.
 
 ---
 
-## 10. 执行流程示例
+## 9. To Be Determined
+
+> The following content is not yet finalized and needs future discussion.
+
+### 9.1 🔖 Retry Mechanism
+
+**Issue**: How to control retries after SubagentStop validation failure?
+
+**To Discuss**:
+- How to configure maximum retry count?
+- Should error feedback be passed during retry?
+- What to do after reaching max retries (skip/terminate)?
+
+### 9.2 🔖 State Persistence
+
+**Issue**: How to recover after workflow interruption?
+
+**To Discuss**:
+- State file format and location
+- Checkpoint save timing
+- Recovery command design
+
+### 9.3 🔖 Timeout Handling
+
+**Issue**: What to do when SubAgent execution takes too long?
+
+**To Discuss**:
+- Timeout configuration location (Agent definition / global config)
+- Timeout handling strategy
+
+---
+
+## 10. Execution Flow Example
 
 ```
-用户: /my-workflow --workdir=/output
+User: /my-workflow --workdir=/output
 
 1. UserPromptSubmit Hook
-   ├── 校验输入（command 参数、环境变量）
-   ├── 创建 $WORKDIR/.context/ 目录
-   └── 初始化工作流状态
+   ├── Validate input (command arguments, environment variables)
+   ├── Create $WORKDIR/.context/ directory
+   └── Initialize workflow state
 
-2. Command 执行
-   ├── 解析 Flow 定义
-   └── 按顺序/并行调用 SubAgent
+2. Command Execution
+   ├── Parse Flow definition
+   └── Call SubAgents in order/parallel
 
-3. 对每个 SubAgent 调用:
+3. For each SubAgent call:
    │
    ├── PreToolUse (Task) Hook
-   │   ├── 识别目标 SubAgent
-   │   ├── 加载输入契约
-   │   ├── 校验输入文件
-   │   └── 失败则阻止执行
+   │   ├── Identify target SubAgent
+   │   ├── Load input contract
+   │   ├── Validate input files
+   │   └── Block execution on failure
    │
-   ├── SubAgent 执行
-   │   ├── 读取 context 文件
-   │   ├── 执行任务
-   │   └── 生成 Markdown 输出
+   ├── SubAgent Execution
+   │   ├── Read context files
+   │   ├── Execute task
+   │   └── Generate Markdown output
    │
    └── SubagentStop Hook
-       ├── 遍历契约匹配输出
-       ├── 匹配成功 → 写入 .context/<agent>.md
-       └── 匹配失败 → 阻止退出，要求重新输出
+       ├── Iterate contracts to match output
+       ├── Match success → write to .context/<agent>.md
+       └── Match failure → block exit, require re-output
 
 4. Stop Hook
-   ├── 校验工作流整体输出
-   ├── 检查所有必要节点完成
-   └── 生成执行报告
+   ├── Validate overall workflow output
+   ├── Check all required nodes completed
+   └── Generate execution report
 ```
 
 ---
 
-## 11. 下一步
+## 11. Next Steps
 
-1. ✅ 完成核心设计（Contract、Nodes、Flow、Context）
-2. ✅ 确定 Flow 表达方式（简洁 DSL + 三种输出格式）
-3. 🔖 讨论并确定重试机制
-4. 🔖 讨论并确定状态持久化方案
-5. 🔖 讨论并确定超时处理
-6. 实现 Flow DSL 解析器
-7. 实现 Flow → Mermaid/结构化文本/DAG JSON 转换器
-8. 创建示例工作流验证设计
+1. ✅ Complete core design (Contract, Nodes, Flow, Context)
+2. ✅ Determine Flow expression (concise DSL + three output formats)
+3. 🔖 Discuss and determine retry mechanism
+4. 🔖 Discuss and determine state persistence solution
+5. 🔖 Discuss and determine timeout handling
+6. Implement Flow DSL parser
+7. Implement Flow → Mermaid/Structured Text/DAG JSON converter
+8. Create example workflow to validate design

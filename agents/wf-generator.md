@@ -14,8 +14,8 @@ All designs confirmed. The agent generates the full directory structure with all
 
 <example>
 Context: User explicitly requests generation
-user: "生成工作流吧"
-assistant: "好的，我来生成完整的工作流文件。"
+user: "Generate the workflow"
+assistant: "Alright, I'll generate the complete workflow files."
 [Calls wf-generator agent]
 <commentary>
 User explicitly requests generation. The agent creates all workflow files.
@@ -24,8 +24,8 @@ User explicitly requests generation. The agent creates all workflow files.
 
 <example>
 Context: User confirms final design
-user: "确认，就按这个设计生成"
-assistant: "根据确认的设计生成工作流..."
+user: "Confirmed, generate based on this design"
+assistant: "Generating workflow based on the confirmed design..."
 [Calls wf-generator agent]
 <commentary>
 User confirms design. The agent proceeds to generate files based on design documents.
@@ -76,10 +76,10 @@ Generate the following structure:
 ```
 .claude/
 ├── commands/
-│   └── <workflow-name>.md           # 工作流入口命令
+│   └── <workflow-name>.md           # Workflow entry command
 │
 ├── agents/
-│   ├── <node-1>.md                  # 节点 SubAgent
+│   ├── <node-1>.md                  # Node SubAgent
 │   ├── <node-2>.md
 │   └── ...
 │
@@ -91,7 +91,7 @@ Generate the following structure:
 │
 └── workflows/
     └── <workflow-name>/
-        ├── flow.yaml                # Flow DSL 定义
+        ├── flow.yaml                # Flow DSL definition
         ├── contracts/
         │   ├── <contract-1>.yaml
         │   ├── <contract-2>.yaml
@@ -99,7 +99,7 @@ Generate the following structure:
         ├── validators/
         │   ├── __init__.py
         │   └── validators.py
-        └── templates/               # 输出模板
+        └── templates/               # Output templates
             └── ...
 ```
 
@@ -109,29 +109,29 @@ Generate the following structure:
 ```markdown
 ---
 name: <workflow-name>
-description: [工作流描述]
-argument-hint: "[参数说明]"
+description: [Workflow description]
+argument-hint: "[Argument description]"
 ---
 
-# [工作流名称]
+# [Workflow Name]
 
-[从 overview.md 提取的工作流说明]
+[Workflow description extracted from overview.md]
 
-## 执行流程
+## Execution Flow
 
-[从 flow.md 提取的流程说明]
+[Flow description extracted from flow.md]
 
-## 节点说明
+## Node Overview
 
-[从 nodes.md 提取的节点概述]
+[Node overview extracted from nodes.md]
 ```
 
 **SubAgent (agents/<node-name>.md):**
 ```markdown
 ---
 name: <node-name>
-description: [节点描述]
-tools: [工具列表]
+description: [Node description]
+tools: [tool list]
 model: inherit
 
 input:
@@ -144,19 +144,19 @@ output:
   target: "$WORKDIR/.context/<node-name>.md"
 ---
 
-你是 [节点角色]。
+You are [node role].
 
-## 任务
+## Task
 
-[节点职责描述]
+[Node responsibility description]
 
-## 输入
+## Input
 
-[输入说明和来源]
+[Input description and sources]
 
-## 输出格式
+## Output Format
 
-必须使用以下格式输出：
+Must use the following format for output:
 
 ```markdown
 ---
@@ -165,16 +165,16 @@ agent: <node-name>
 timestamp: <ISO8601>
 ---
 
-## [标题]
+## [Title]
 
-[内容要求]
+[Content requirements]
 ```
 ```
 
 **Contract (workflows/<name>/contracts/<contract>.yaml):**
 ```yaml
 name: <ContractName>
-description: [契约描述]
+description: [Contract description]
 version: "1.0"
 
 schema:
@@ -209,56 +209,56 @@ examples:
 **Validators (workflows/<name>/validators/validators.py):**
 ```python
 """
-工作流校验器
+Workflow validators
 """
 from typing import Tuple, List
 import yaml
 import re
 
 def parse_frontmatter(content: str) -> dict:
-    """解析 Markdown frontmatter"""
+    """Parse Markdown frontmatter"""
     match = re.match(r'^---\n(.*?)\n---', content, re.DOTALL)
     if match:
         return yaml.safe_load(match.group(1))
     return {}
 
 def validate_<contract_name>(data: dict) -> Tuple[bool, List[str]]:
-    """校验 <ContractName>"""
+    """Validate <ContractName>"""
     errors = []
 
-    # 检查必填字段
+    # Check required fields
     if 'header' not in data:
-        errors.append("缺少 header 字段")
+        errors.append("Missing header field")
     else:
         header = data['header']
         if header.get('type') != '<contract-type>':
-            errors.append(f"type 应为 '<contract-type>'，实际为 '{header.get('type')}'")
+            errors.append(f"type should be '<contract-type>', got '{header.get('type')}'")
         if header.get('agent') != '<agent-name>':
-            errors.append(f"agent 应为 '<agent-name>'，实际为 '{header.get('agent')}'")
+            errors.append(f"agent should be '<agent-name>', got '{header.get('agent')}'")
 
     if 'content' not in data or not data['content']:
-        errors.append("缺少 content 字段或内容为空")
+        errors.append("Missing content field or content is empty")
 
     return len(errors) == 0, errors
 
-# [其他契约的校验函数]
+# [Validator functions for other contracts]
 ```
 
 **Flow (workflows/<name>/flow.yaml):**
 ```yaml
 name: <workflow-name>
 version: "1.0"
-description: [工作流描述]
+description: [Workflow description]
 
 flow: |
-  [从 flow.md 提取的 Flow DSL]
+  [Flow DSL extracted from flow.md]
 
 conditions:
-  [从 flow.md 提取的条件定义]
+  [Condition definitions extracted from flow.md]
 
 execution:
-  max_parallel: [数值]
-  timeout: [数值]
+  max_parallel: [value]
+  timeout: [value]
 ```
 
 **Generation Report:**
@@ -266,27 +266,27 @@ execution:
 After generation, provide a summary:
 
 ```markdown
-## 工作流生成完成
+## Workflow Generation Complete
 
-### 生成的文件
+### Generated Files
 
-| 路径 | 类型 | 说明 |
-|------|------|------|
-| .claude/commands/<name>.md | Command | 工作流入口 |
-| .claude/agents/<node>.md | Agent | [节点说明] |
+| Path | Type | Description |
+|------|------|-------------|
+| .claude/commands/<name>.md | Command | Workflow entry point |
+| .claude/agents/<node>.md | Agent | [Node description] |
 | ... | ... | ... |
 
-### 下一步
+### Next Steps
 
-1. 检查生成的文件内容
-2. 根据需要调整 SubAgent 的 system prompt
-3. 完善 validators 的校验逻辑
-4. 测试工作流执行
+1. Review the generated file contents
+2. Adjust SubAgent system prompts as needed
+3. Refine validator logic
+4. Test workflow execution
 
-### 使用方式
+### Usage
 
 ```bash
-/<workflow-name> [参数]
+/<workflow-name> [arguments]
 ```
 ```
 

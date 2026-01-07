@@ -1,54 +1,54 @@
-# AI 工作流设计原则（完整参考）
+# AI Workflow Design Principles (Complete Reference)
 
-## 概述
+## Overview
 
-本文档定义了 AI 驱动工作流的设计原则和核心概念，适用于基于 LLM Agent 的自动化任务编排。
+This document defines design principles and core concepts for AI-driven workflows, applicable to automated task orchestration based on LLM Agents.
 
-## 核心概念
+## Core Concepts
 
-AI 工作流由 4 个核心概念组成：
+AI workflows consist of 4 core concepts:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                      Workflow                           │
 ├─────────────────────────────────────────────────────────┤
-│  1. Contract (契约)                                      │
-│  2. Nodes (节点)                                         │
-│  3. Flow (流程)                                          │
-│  4. Context (上下文)                                     │
+│  1. Contract                                            │
+│  2. Nodes                                               │
+│  3. Flow                                                │
+│  4. Context                                             │
 └─────────────────────────────────────────────────────────┘
 ```
 
-| 概念 | 回答的问题 |
-|------|-----------|
-| Contract | 数据长什么样？如何验证？ |
-| Nodes | 谁来执行？输入输出是什么？ |
-| Flow | 按什么顺序执行？出错怎么办？ |
-| Context | 执行时需要什么环境信息？ |
+| Concept | Question It Answers |
+|---------|---------------------|
+| Contract | What does the data look like? How to validate? |
+| Nodes | Who executes? What are inputs and outputs? |
+| Flow | What order to execute? What to do on error? |
+| Context | What environment info is needed at execution? |
 
 ---
 
-## 1. Contract（契约）
+## 1. Contract
 
-契约定义了工作流中所有数据结构的规范，是确保 AI 输出合规性的关键。
+Contracts define the specifications for all data structures in a workflow, key to ensuring AI output compliance.
 
-### 组成要素
+### Components
 
-| 要素 | 说明 | 必要性 |
-|------|------|--------|
-| Schema | 数据结构定义（字段、类型、约束） | ✅ 必须 |
-| Validator | 校验器实现 | ✅ 必须 |
-| Examples | 示例数据 | 建议 |
+| Component | Description | Required |
+|-----------|-------------|----------|
+| Schema | Data structure definition (fields, types, constraints) | ✅ Required |
+| Validator | Validator implementation | ✅ Required |
+| Examples | Sample data | Recommended |
 
-### 设计原则
+### Design Principles
 
-1. **每个数据结构都必须有对应的校验器** - AI 输出不可信，必须验证
-2. **Schema 和 Validator 共存** - Schema 用于文档和生成，Validator 用于运行时检查
-3. **契约是节点间的接口** - 节点通过契约解耦
+1. **Every data structure must have a corresponding validator** - AI output cannot be trusted, must be validated
+2. **Schema and Validator coexist** - Schema for documentation and generation, Validator for runtime checks
+3. **Contracts are interfaces between nodes** - Nodes are decoupled through contracts
 
-### 契约文件结构
+### Contract File Structure
 
-契约集中存放，节点通过名称引用：
+Contracts are centrally stored, nodes reference by name:
 
 ```
 workflow/
@@ -60,23 +60,23 @@ workflow/
     └── validators.py
 ```
 
-### 契约定义格式
+### Contract Definition Format
 
-**契约文件字段说明**
+**Contract File Field Description**
 
-| 字段 | 类型 | 必须 | 说明 |
-|------|------|------|------|
-| name | string | ✅ | 契约名称（被节点引用的稳定标识） |
-| description | string | 建议 | 契约用途说明 |
-| schema | object | ✅ | 数据结构定义（建议采用 JSON Schema 表达） |
-| validator | string | ✅ | 运行时校验器入口，格式 `path/to/file.py::function_name` |
-| examples | string[] | 建议 | 示例文件路径列表（用于 prompt/测试/回归） |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| name | string | ✅ | Contract name (stable identifier referenced by nodes) |
+| description | string | Recommended | Contract purpose description |
+| schema | object | ✅ | Data structure definition (JSON Schema recommended) |
+| validator | string | ✅ | Runtime validator entry point, format `path/to/file.py::function_name` |
+| examples | string[] | Recommended | List of example file paths (for prompt/testing/regression) |
 
-**契约文件示例**
+**Contract File Example**
 
 ```yaml
 name: ContractName
-description: 契约用途说明
+description: Contract purpose description
 version: "1.0"
 
 schema:
@@ -92,7 +92,7 @@ schema:
         - agent
       properties:
         type:
-          const: "contract-type"    # 唯一标识，用于匹配
+          const: "contract-type"    # Unique identifier for matching
         agent:
           const: "agent-name"
         timestamp:
@@ -108,41 +108,41 @@ examples:
   - path: examples/sample.md
 ```
 
-### 契约引用（Markdown 示范）
+### Contract Reference (Markdown Example)
 
-| 字段 | 类型 | 必须 | 说明 |
-|------|------|------|------|
-| contract.name | string | ✅ | 契约名称（如 `ContractA`） |
-| contract.schema | string | ✅ | schema 文件路径（如 `schemas/contract-a.schema.json`） |
-| contract.validator | string | ✅ | 校验器入口（如 `validators.py::validate_contract_a`） |
-| contract.examples | string[] | 可选 | 示例文件路径列表 |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| contract.name | string | ✅ | Contract name (e.g., `ContractA`) |
+| contract.schema | string | ✅ | Schema file path (e.g., `schemas/contract-a.schema.json`) |
+| contract.validator | string | ✅ | Validator entry point (e.g., `validators.py::validate_contract_a`) |
+| contract.examples | string[] | Optional | List of example file paths |
 
-### 节点输入输出绑定（Markdown 示范）
+### Node Input/Output Binding (Markdown Example)
 
-| 字段 | 类型 | 必须 | 说明 |
-|------|------|------|------|
-| node.name | string | ✅ | 节点名称（如 `NodeX`） |
-| node.input.contract | string | ✅ | 输入契约名（如 `ContractA`） |
-| node.input.source | string | ✅ | 输入来源路径模板（如 `$WORKDIR/intermediate/{entity}/input-a.md`） |
-| node.output.contract | string | ✅ | 输出契约名（如 `ContractB`） |
-| node.output.target | string | ✅ | 输出目标路径模板（如 `$WORKDIR/{entity}/result.json`） |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| node.name | string | ✅ | Node name (e.g., `NodeX`) |
+| node.input.contract | string | ✅ | Input contract name (e.g., `ContractA`) |
+| node.input.source | string | ✅ | Input source path template (e.g., `$WORKDIR/intermediate/{entity}/input-a.md`) |
+| node.output.contract | string | ✅ | Output contract name (e.g., `ContractB`) |
+| node.output.target | string | ✅ | Output target path template (e.g., `$WORKDIR/{entity}/result.json`) |
 
-### 运行时绑定
+### Runtime Binding
 
-1. 节点执行前：解析 `input.contract` 引用，加载校验器，执行输入校验
-2. 节点执行后：解析 `output.contract` 引用，加载校验器，执行输出校验
-3. 校验失败：触发 Flow 定义的错误处理
+1. Before node execution: Parse `input.contract` reference, load validator, execute input validation
+2. After node execution: Parse `output.contract` reference, load validator, execute output validation
+3. Validation failure: Trigger error handling defined in Flow
 
-### 校验时机
+### Validation Timing
 
-| 时机 | 触发条件 | 校验内容 | 失败处理 |
-|------|---------|---------|---------|
-| 输入校验 | 节点执行前 | 输入契约 | 阻止执行 |
-| 输出校验 | 节点执行后 | 输出契约 | 触发重试或错误处理 |
+| Timing | Trigger Condition | Validation Content | Failure Handling |
+|--------|-------------------|-------------------|------------------|
+| Input Validation | Before node execution | Input contract | Block execution |
+| Output Validation | After node execution | Output contract | Trigger retry or error handling |
 
-### 契约唯一性
+### Contract Uniqueness
 
-为确保 SubagentStop 能正确匹配输出到契约，每个输出契约必须有**唯一标识符**：
+To ensure SubagentStop can correctly match output to contract, each output contract must have a **unique identifier**:
 
 ```yaml
 schema:
@@ -150,50 +150,50 @@ schema:
     header:
       properties:
         type:
-          const: "processor-output"    # 每个契约的 type 必须唯一
+          const: "processor-output"    # Each contract's type must be unique
         agent:
-          const: "data-processor"      # 对应的 Agent 名称
+          const: "data-processor"      # Corresponding Agent name
 ```
 
 ---
 
-## 2. Nodes（节点）
+## 2. Nodes
 
-节点是工作流的执行单元，在 AI 工作流中通常由 SubAgent 实现。
+Nodes are the execution units of a workflow, typically implemented by SubAgents in AI workflows.
 
-### 组成要素
+### Components
 
-| 要素 | 说明 | 必要性 |
-|------|------|--------|
-| 输入契约 | 引用 Contract 定义 | ✅ 必须 |
-| 输出契约 | 引用 Contract 定义 | ✅ 必须 |
-| 实现 | SubAgent 定义（prompt、skills、tools、model） | ✅ 必须 |
+| Component | Description | Required |
+|-----------|-------------|----------|
+| Input Contract | Reference to Contract definition | ✅ Required |
+| Output Contract | Reference to Contract definition | ✅ Required |
+| Implementation | SubAgent definition (prompt, skills, tools, model) | ✅ Required |
 
-### 设计原则
+### Design Principles
 
-1. **单一职责** - 每个节点只做一件事
-2. **输入输出明确** - 通过契约定义，不依赖隐式约定
-3. **可独立测试** - 给定输入，能独立验证输出
-4. **幂等性** - 相同输入产生相同输出（尽可能）
+1. **Single Responsibility** - Each node does only one thing
+2. **Clear Input/Output** - Defined through contracts, no implicit conventions
+3. **Independently Testable** - Given input, can independently verify output
+4. **Idempotency** - Same input produces same output (as much as possible)
 
-### 节点定义格式
+### Node Definition Format
 
-| 字段 | 类型 | 必须 | 说明 |
-|------|------|------|------|
-| name | string | ✅ | 节点名称（稳定标识） |
-| description | string | 建议 | 节点用途说明 |
-| input.contract | string | ✅ | 输入契约名称 |
-| input.source | string | ✅ | 输入文件路径模板（可包含占位符，如 `{entity}`） |
-| output.contract | string | ✅ | 输出契约名称 |
-| output.target | string | ✅ | 输出文件路径模板（可包含占位符，如 `{entity}`） |
-| implementation | object | ✅ | 节点实现配置 |
-| implementation.type | string | ✅ | 实现类型（如 `subagent` / `script` / `service`） |
-| implementation.agent | string | 可选 | agent/prompt 定义入口（当 `type=subagent`） |
-| implementation.skills | string[] | 可选 | 复用能力集合 |
-| implementation.tools | string[] | 可选 | 允许使用的工具集合 |
-| implementation.model | string | 可选 | 模型选择策略（如 `inherit` / 显式指定） |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| name | string | ✅ | Node name (stable identifier) |
+| description | string | Recommended | Node purpose description |
+| input.contract | string | ✅ | Input contract name |
+| input.source | string | ✅ | Input file path template (may contain placeholders like `{entity}`) |
+| output.contract | string | ✅ | Output contract name |
+| output.target | string | ✅ | Output file path template (may contain placeholders like `{entity}`) |
+| implementation | object | ✅ | Node implementation configuration |
+| implementation.type | string | ✅ | Implementation type (e.g., `subagent` / `script` / `service`) |
+| implementation.agent | string | Optional | Agent/prompt definition entry (when `type=subagent`) |
+| implementation.skills | string[] | Optional | Reusable skill set |
+| implementation.tools | string[] | Optional | Allowed tool set |
+| implementation.model | string | Optional | Model selection strategy (e.g., `inherit` / explicit specification) |
 
-### 契约与节点的绑定
+### Contract and Node Binding
 
 ```
 contracts/                      nodes/
@@ -206,28 +206,28 @@ contracts/                      nodes/
                                 │       - contract: ContractD
 ```
 
-### 运行时校验流程
+### Runtime Validation Flow
 
 ```
-1. 加载节点定义
-2. 解析 input.contract，找到对应契约
-3. 执行输入校验（validator）
-   - 通过 → 继续
-   - 失败 → 阻止执行
-4. 执行节点（SubAgent）
-5. 解析 output.contract，找到对应契约
-6. 执行输出校验（validator）
-   - 通过 → 完成
-   - 失败 → 触发 Flow 错误处理（重试/跳过/终止）
+1. Load node definition
+2. Parse input.contract, find corresponding contract
+3. Execute input validation (validator)
+   - Pass → Continue
+   - Fail → Block execution
+4. Execute node (SubAgent)
+5. Parse output.contract, find corresponding contract
+6. Execute output validation (validator)
+   - Pass → Complete
+   - Fail → Trigger Flow error handling (retry/skip/terminate)
 ```
 
 ---
 
-## 3. Skill（技能）
+## 3. Skill
 
-Skill 是可复用的知识和工具组合，供多个节点共享。
+Skills are reusable knowledge and tool combinations shared by multiple nodes.
 
-### SKILL.md 规范
+### SKILL.md Specification
 
 ```markdown
 ---
@@ -244,120 +244,120 @@ Provide clear, step-by-step guidance for Claude.
 Show concrete examples of using this Skill.
 ```
 
-- **frontmatter**（必须）：`name` 和 `description`
-- **内容**（灵活）：Instructions、Examples 等，按需组织
+- **frontmatter** (required): `name` and `description`
+- **content** (flexible): Instructions, Examples, etc., organized as needed
 
-### Skill 目录结构
+### Skill Directory Structure
 
 ```
 .claude/skills/{skill-name}/
-├── SKILL.md                    # 主入口（必须）
-├── scripts/                    # 工具脚本（推荐）
-├── references/                 # 领域知识（推荐）
-└── ...                         # 其他目录（按需扩展）
+├── SKILL.md                    # Main entry (required)
+├── scripts/                    # Tool scripts (recommended)
+├── references/                 # Domain knowledge (recommended)
+└── ...                         # Other directories (extend as needed)
 ```
 
-### Skill 与 Node 的关系
+### Skill and Node Relationship
 
-- Skill 提供"知识"（指导、参考文档、工具脚本）
-- Node 定义"任务"（输入、输出、执行逻辑）
-- 一个 Skill 可被多个 Node 引用
-- Node 通过 `skills: [skill-name]` 绑定 Skill
-
----
-
-## 4. Flow（流程）
-
-Flow 定义"如何执行"——节点的执行规则。
-
-### 本质
-
-Flow 是一个抽象概念，描述执行控制的规则集合。具体工作流可根据需求选择适合的控制模式。
-
-### Flow 需要回答的问题
-
-| 维度 | 问题 | 可能的模式 |
-|------|------|-----------|
-| 顺序 | 节点按什么顺序执行？ | 顺序、并发、依赖图 |
-| 重复 | 何时需要重复执行？ | 循环、迭代、递归 |
-| 分支 | 何时走不同路径？ | 条件分支、模式匹配 |
-| 错误 | 失败时怎么办？ | 重试、跳过、回滚、降级 |
-
-### 设计原则
-
-1. **Flow 是抽象的** - 不限定具体编排模式，由各工作流自行定义
-2. **错误处理是 Flow 的一部分** - 不是独立概念
-3. **显式优于隐式** - 执行规则应明确声明
-4. **可观测** - 能追踪执行状态
-
-### Flow DSL 语法
-
-| 符号 | 含义 | 示例 | 说明 |
-|------|------|------|------|
-| `>>` | 顺序依赖 | `a >> b >> c` | a 完成后执行 b，b 完成后执行 c |
-| `[a, b]` | 并行组 | `x >> [a, b] >> y` | a 和 b 并行执行，全部完成后执行 y |
-| `?label` | 条件分支 | `a ?ok >> b` | a 输出满足 ok 条件时执行 b |
-| `* $var` | 循环迭代 | `a * $items` | 对 $items 中每个元素执行 a |
-| `* $var[n]` | 并行循环 | `a * $items[3]` | 并行度为 3 的循环迭代 |
-| `START` | 起始节点 | `START >> a` | 工作流入口 |
-| `END` | 结束节点 | `a >> END` | 工作流出口 |
+- Skills provide "knowledge" (guidance, reference documents, tool scripts)
+- Nodes define "tasks" (input, output, execution logic)
+- One Skill can be referenced by multiple Nodes
+- Nodes bind Skills through `skills: [skill-name]`
 
 ---
 
-## 5. Context（上下文）
+## 4. Flow
 
-上下文定义工作流执行时的环境信息和共享状态。
+Flow defines "how to execute" - the execution rules for nodes.
 
-### 组成要素
+### Essence
 
-| 要素 | 说明 | 必要性 |
-|------|------|--------|
-| 环境变量 | 执行环境参数 | ✅ 必须 |
-| 共享状态 | 节点间传递的状态 | 可选 |
-| 存储布局 | 中间产物存储位置 | ✅ 必须 |
+Flow is an abstract concept describing a set of execution control rules. Specific workflows can choose appropriate control patterns based on requirements.
 
-### 设计原则
+### Questions Flow Needs to Answer
 
-1. **显式声明** - 所有上下文变量必须在工作流入口声明
-2. **不可变优先** - 环境变量在执行期间不应改变
-3. **存储布局统一** - 所有节点遵循相同的目录结构
+| Dimension | Question | Possible Patterns |
+|-----------|----------|-------------------|
+| Order | In what order do nodes execute? | Sequential, concurrent, dependency graph |
+| Repetition | When to repeat execution? | Loop, iteration, recursion |
+| Branching | When to take different paths? | Conditional branch, pattern matching |
+| Error | What to do on failure? | Retry, skip, rollback, fallback |
 
-### 上下文定义详细字段
+### Design Principles
 
-**env（环境变量，工作流输入）**
+1. **Flow is abstract** - Not limited to specific orchestration patterns, defined by each workflow
+2. **Error handling is part of Flow** - Not a separate concept
+3. **Explicit over implicit** - Execution rules should be clearly declared
+4. **Observable** - Able to track execution state
 
-| 变量名 | 类型 | 必须 | 说明 |
-|-------|------|------|------|
-| WORKDIR | string | ✅ | 工作目录 |
-| WORKFLOW_NAME | string | ✅ | 工作流名称 |
-| SOURCE_DIR | string | 可选 | 源码/数据所在目录 |
-| OUTPUT_DIR | string | 可选 | 输出目录 |
+### Flow DSL Syntax
 
-**layout（存储布局）**
-
-| 字段 | 类型 | 必须 | 说明 | 示例（模板） |
-|------|------|------|------|--------------|
-| intermediate | string | ✅ | 中间产物目录 | `$WORKDIR/.context/` |
-| final | string | ✅ | 最终产物目录 | `$WORKDIR/output/` |
-| temp | string | ✅ | 临时目录 | `$WORKDIR/.temp/` |
-
-**state（共享状态，运行时生成）**
-
-| 键 | 类型 | 必须 | 说明 | populated_by |
-|----|------|------|------|--------------|
-| collected_data | any | 可选 | 收集阶段产出的数据 | `collector` |
-| analysis_result | any | 可选 | 分析阶段产出的结果 | `analyzer` |
+| Symbol | Meaning | Example | Description |
+|--------|---------|---------|-------------|
+| `>>` | Sequential dependency | `a >> b >> c` | a completes, then b, then c |
+| `[a, b]` | Parallel group | `x >> [a, b] >> y` | a and b execute in parallel, y waits for all |
+| `?label` | Conditional branch | `a ?ok >> b` | Execute b when a output satisfies ok condition |
+| `* $var` | Loop iteration | `a * $items` | Execute a for each item in $items |
+| `* $var[n]` | Parallel loop | `a * $items[3]` | Parallel iteration with degree 3 |
+| `START` | Entry point | `START >> a` | Workflow entry |
+| `END` | Exit point | `a >> END` | Workflow exit |
 
 ---
 
-## 概念关系图
+## 5. Context
+
+Context defines environment information and shared state during workflow execution.
+
+### Components
+
+| Component | Description | Required |
+|-----------|-------------|----------|
+| Environment Variables | Execution environment parameters | ✅ Required |
+| Shared State | State passed between nodes | Optional |
+| Storage Layout | Intermediate artifact storage locations | ✅ Required |
+
+### Design Principles
+
+1. **Explicit Declaration** - All context variables must be declared at workflow entry
+2. **Prefer Immutability** - Environment variables should not change during execution
+3. **Unified Storage Layout** - All nodes follow the same directory structure
+
+### Context Definition Detailed Fields
+
+**env (Environment Variables, Workflow Input)**
+
+| Variable | Type | Required | Description |
+|----------|------|----------|-------------|
+| WORKDIR | string | ✅ | Working directory |
+| WORKFLOW_NAME | string | ✅ | Workflow name |
+| SOURCE_DIR | string | Optional | Source/data directory |
+| OUTPUT_DIR | string | Optional | Output directory |
+
+**layout (Storage Layout)**
+
+| Field | Type | Required | Description | Example (Template) |
+|-------|------|----------|-------------|-------------------|
+| intermediate | string | ✅ | Intermediate artifact directory | `$WORKDIR/.context/` |
+| final | string | ✅ | Final artifact directory | `$WORKDIR/output/` |
+| temp | string | ✅ | Temporary directory | `$WORKDIR/.temp/` |
+
+**state (Shared State, Generated at Runtime)**
+
+| Key | Type | Required | Description | populated_by |
+|-----|------|----------|-------------|--------------|
+| collected_data | any | Optional | Data produced by collection phase | `collector` |
+| analysis_result | any | Optional | Results produced by analysis phase | `analyzer` |
+
+---
+
+## Concept Relationship Diagram
 
 ```
                     ┌─────────────┐
                     │   Context   │
-                    │  (环境变量)  │
+                    │  (env vars) │
                     └──────┬──────┘
-                           │ 提供执行环境
+                           │ Provides execution environment
                            ▼
 ┌─────────────────────────────────────────────────────┐
 │                       Flow                          │
@@ -373,68 +373,68 @@ Flow 是一个抽象概念，描述执行控制的规则集合。具体工作流
         ▼              ▼              ▼
    ┌─────────┐    ┌─────────┐    ┌─────────┐
    │Contract │    │Contract │    │Contract │
-   │ (输入)  │    │ (中间)  │    │ (输出)  │
+   │ (input) │    │(middle) │    │(output) │
    └─────────┘    └─────────┘    └─────────┘
 ```
 
-### 核心关系
+### Core Relationships
 
-- **Skill** 提供可复用的知识（prompt + 工具）
-- **Node** 引用 Skill，定义具体任务
-- **Contract** 是 Node 间的接口
-- **Flow** 编排 Node 的执行
-- **Context** 为执行提供环境
+- **Skill** provides reusable knowledge (prompt + tools)
+- **Node** references Skill, defines specific tasks
+- **Contract** is the interface between Nodes
+- **Flow** orchestrates Node execution
+- **Context** provides environment for execution
 
 ---
 
-## AI 工作流的特殊考量
+## Special Considerations for AI Workflows
 
-### 与传统工作流的区别
+### Differences from Traditional Workflows
 
-| 方面 | 传统工作流 | AI 工作流 |
-|------|-----------|----------|
-| 输出确定性 | 确定性 | 非确定性 |
-| 校验必要性 | 可选 | 必须 |
-| 错误类型 | 主要是异常 | 格式错误、语义错误、幻觉 |
-| 重试策略 | 简单重试 | 带反馈重试 |
+| Aspect | Traditional Workflow | AI Workflow |
+|--------|---------------------|-------------|
+| Output Determinism | Deterministic | Non-deterministic |
+| Validation Necessity | Optional | Required |
+| Error Types | Mainly exceptions | Format errors, semantic errors, hallucinations |
+| Retry Strategy | Simple retry | Retry with feedback |
 
-### AI 特有的设计要点
+### AI-Specific Design Points
 
-1. **校验器是强制的** - 不能信任 AI 输出
-2. **带反馈重试** - 将校验错误作为上下文反馈给 Agent
-3. **示例驱动** - 在 prompt 中提供清晰的输出示例
-4. **渐进式细化** - 复杂任务拆分为多个简单节点
+1. **Validators are mandatory** - Cannot trust AI output
+2. **Retry with feedback** - Pass validation errors as context back to Agent
+3. **Example-driven** - Provide clear output examples in prompts
+4. **Progressive refinement** - Split complex tasks into multiple simple nodes
 
-### Prompt 与 Contract 的关系
+### Relationship Between Prompt and Contract
 
 ```
 Contract (Schema)
     │
-    ├──▶ 生成 Prompt 中的输出格式说明
+    ├──▶ Generate output format instructions in Prompt
     │
-    ├──▶ 生成 Examples
+    ├──▶ Generate Examples
     │
-    └──▶ 生成 Validator
+    └──▶ Generate Validator
 ```
 
 ---
 
-## 文档组织建议
+## Document Organization Recommendations
 
 ```
 workflow/
-├── contracts/           # 契约定义
+├── contracts/           # Contract definitions
 │   ├── contract-a.yaml
 │   ├── contract-b.yaml
 │   ├── contract-c.yaml
 │   └── ...
-├── nodes/               # 节点定义
+├── nodes/               # Node definitions
 │   ├── node-a.md
 │   ├── node-b.md
 │   └── ...
-├── flow.yaml            # 流程编排
-├── context.yaml         # 上下文定义
-└── validators/          # 校验器实现
+├── flow.yaml            # Flow orchestration
+├── context.yaml         # Context definition
+└── validators/          # Validator implementations
     ├── __init__.py
     ├── contract_a.py
     ├── contract_c.py
@@ -443,19 +443,19 @@ workflow/
 
 ---
 
-## 总结
+## Summary
 
-| 概念 | 职责 | AI 特有考量 |
-|------|------|------------|
-| **Contract** | 数据规范 + 校验 | 校验器必须存在，多时机校验 |
-| **Nodes** | 执行单元 | SubAgent + Skill 实现 |
-| **Flow** | 执行控制（顺序、分支、错误处理） | 抽象定义，带反馈重试 |
-| **Context** | 环境 + 状态 | 存储布局统一 |
+| Concept | Responsibility | AI-Specific Considerations |
+|---------|---------------|---------------------------|
+| **Contract** | Data specification + validation | Validators must exist, multi-timing validation |
+| **Nodes** | Execution units | SubAgent + Skill implementation |
+| **Flow** | Execution control (order, branching, error handling) | Abstract definition, retry with feedback |
+| **Context** | Environment + state | Unified storage layout |
 
-### 设计原则
+### Design Principles
 
-- **契约先行**：先定义数据规范，再实现节点
-- **校验必备**：每个契约都有校验器，明确校验时机
-- **Flow 是抽象的**：不限定具体模式，按需选用
-- **错误处理是 Flow 的一部分**
-- **显式优于隐式**
+- **Contract First**: Define data specifications first, then implement nodes
+- **Validators Required**: Every contract has a validator, clear validation timing
+- **Flow is Abstract**: Not limited to specific patterns, choose as needed
+- **Error handling is part of Flow**
+- **Explicit over Implicit**

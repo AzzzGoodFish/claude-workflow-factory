@@ -14,8 +14,8 @@ User is ready to design flow after nodes are defined. The agent creates Flow DSL
 
 <example>
 Context: User wants to add parallel execution
-user: "我想让 lint 和 test 节点并行执行"
-assistant: "让我更新流程设计，添加并行执行。"
+user: "I want the lint and test nodes to execute in parallel"
+assistant: "Let me update the flow design to add parallel execution."
 [Calls wf-flow-designer agent]
 <commentary>
 User wants parallel execution. The agent redesigns flow with parallel groups.
@@ -87,7 +87,7 @@ agent: wf-flow-designer
 timestamp: [ISO8601]
 ---
 
-## 流程设计
+## Flow Design
 
 ### Flow DSL
 
@@ -108,73 +108,73 @@ execution:
   timeout: [seconds]
 ```
 
-### 流程说明
+### Flow Description
 
-**主流程:**
-1. [步骤1说明]
-2. [步骤2说明]
-3. [步骤3说明]
+**Main Flow:**
+1. [Step 1 description]
+2. [Step 2 description]
+3. [Step 3 description]
 
-**分支路径:**
-- **[条件]**: [执行路径说明]
+**Branch Paths:**
+- **[Condition]**: [Execution path description]
 
-**错误处理:**
-- **[错误类型]**: [处理方式]
+**Error Handling:**
+- **[Error Type]**: [Handling approach]
 
-### Mermaid 流程图
+### Mermaid Flow Diagram
 
 ```mermaid
 flowchart LR
-    START([开始])
+    START([Start])
     [node definitions]
-    END([结束])
+    END([End])
 
     START --> [node]
     [edges]
 ```
 
-### 执行路径分析
+### Execution Path Analysis
 
-| 路径 | 触发条件 | 执行节点 |
-|------|---------|---------|
-| 主路径 | [条件] | [节点序列] |
-| [分支名] | [条件] | [节点序列] |
+| Path | Trigger Condition | Executed Nodes |
+|------|-------------------|----------------|
+| Main Path | [condition] | [node sequence] |
+| [Branch Name] | [condition] | [node sequence] |
 
-### 依赖关系
+### Dependencies
 
-| 节点 | 依赖于 | 被依赖于 |
-|------|--------|---------|
-| [节点] | [前置节点] | [后续节点] |
+| Node | Depends On | Depended By |
+|------|------------|-------------|
+| [node] | [predecessor nodes] | [successor nodes] |
 
-### 并行分析
+### Parallelization Analysis
 
-**并行组:**
-- **[组名]**: [节点列表]
-- **最大并行度**: [数量]
+**Parallel Groups:**
+- **[Group Name]**: [node list]
+- **Max Parallelism**: [count]
 
-**并行条件:**
-- [哪些节点可以并行的原因]
+**Parallelization Rationale:**
+- [Why these nodes can run in parallel]
 
-### 条件表达式
+### Condition Expressions
 
-| 条件标签 | 表达式 | 说明 |
-|---------|--------|------|
-| [label] | [expression] | [何时触发] |
+| Condition Label | Expression | Description |
+|-----------------|------------|-------------|
+| [label] | [expression] | [When triggered] |
 
-## 设计考量
+## Design Considerations
 
-### 为什么这样设计
+### Design Rationale
 
-- **[设计决策1]**: [理由]
-- **[设计决策2]**: [理由]
+- **[Design Decision 1]**: [reasoning]
+- **[Design Decision 2]**: [reasoning]
 
-### 替代方案
+### Alternative Approaches
 
-- **[方案]**: [优缺点分析]
+- **[Approach]**: [Pros/cons analysis]
 
-## 待确认项
+## Items Requiring Confirmation
 
-1. **[决策点]**: [需要用户确认的问题]
+1. **[Decision Point]**: [Question requiring user confirmation]
 ```
 
 **Quality Standards:**

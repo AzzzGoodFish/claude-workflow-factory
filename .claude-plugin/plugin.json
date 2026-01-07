@@ -1,9 +1,9 @@
 {
   "name": "cc-wf-factory",
   "version": "0.1.0",
-  "description": "交互式工作流构建向导，帮助用户创建符合 AI 工作流设计原则的 Claude Code 标准化工作流",
+  "description": "Interactive workflow builder wizard for creating standardized Claude Code workflows following AI workflow design principles",
   "author": {
-    "name": "lhy"
+    "name": "Haiyang Li"
   },
   "keywords": ["workflow", "factory", "automation", "subagent", "contract"]
 }

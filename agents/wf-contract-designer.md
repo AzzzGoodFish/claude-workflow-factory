@@ -14,8 +14,8 @@ User is ready to design contracts after node definition. The agent designs schem
 
 <example>
 Context: User wants to define input/output format for a specific node
-user: "我需要为 fetch-pr 节点定义输入输出的数据格式"
-assistant: "让我帮你设计 fetch-pr 节点的契约。"
+user: "I need to define the input/output data format for the fetch-pr node"
+assistant: "Let me help you design the contracts for the fetch-pr node."
 [Calls wf-contract-designer agent]
 <commentary>
 User needs contract for specific node. The agent designs schema and validation for that node's I/O.
@@ -79,37 +79,37 @@ agent: wf-contract-designer
 timestamp: [ISO8601]
 ---
 
-## 契约设计概览
+## Contract Design Overview
 
-### 契约清单
+### Contract List
 
-| 契约名称 | 用途 | 生产者 | 消费者 |
-|---------|------|--------|--------|
-| [名称] | [用途] | [节点/输入] | [节点/输出] |
+| Contract Name | Purpose | Producer | Consumer |
+|---------------|---------|----------|----------|
+| [name] | [purpose] | [node/input] | [node/output] |
 
 ---
 
-## 契约详情
+## Contract Details
 
 ### [ContractName]
 
-**用途**: [这个契约用于什么]
+**Purpose**: [What this contract is used for]
 
-**生产者**: [哪个节点或输入产生此数据]
-**消费者**: [哪些节点使用此数据]
+**Producer**: [Which node or input produces this data]
+**Consumer**: [Which nodes consume this data]
 
 **Schema (JSON Schema):**
 
 ```yaml
 name: [ContractName]
-description: [契约描述]
+description: [Contract description]
 version: "1.0"
 
 schema:
   type: object
   required:
     - header
-    - [其他必填字段]
+    - [other required fields]
   properties:
     header:
       type: object
@@ -124,10 +124,10 @@ schema:
         timestamp:
           type: string
           format: date-time
-    [其他字段]:
-      type: [类型]
-      description: [说明]
-      [约束]
+    [other fields]:
+      type: [type]
+      description: [description]
+      [constraints]
 
 validator: validators/[contract_name].py::validate
 
@@ -135,29 +135,29 @@ examples:
   - path: examples/[contract-name]-sample.md
 ```
 
-**校验规则:**
+**Validation Rules:**
 
-| 规则 | 字段 | 描述 | 错误消息 |
-|------|------|------|---------|
-| [规则名] | [字段] | [规则说明] | [失败时的消息] |
+| Rule | Field | Description | Error Message |
+|------|-------|-------------|---------------|
+| [rule name] | [field] | [rule description] | [failure message] |
 
-**Validator 实现要点:**
+**Validator Implementation Notes:**
 
 ```python
 def validate(data: dict) -> tuple[bool, list[str]]:
     """
-    校验 [ContractName]
+    Validate [ContractName]
 
-    关键校验:
-    - [校验点1]
-    - [校验点2]
+    Key validations:
+    - [validation point 1]
+    - [validation point 2]
     """
     errors = []
-    # [校验逻辑说明]
+    # [validation logic description]
     return len(errors) == 0, errors
 ```
 
-**示例数据:**
+**Example Data:**
 
 ```markdown
 ---
@@ -166,42 +166,42 @@ agent: [producer-agent-name]
 timestamp: 2026-01-07T10:00:00Z
 ---
 
-## [内容标题]
+## [Content Title]
 
-[示例内容...]
+[Example content...]
 ```
 
 ---
 
-[重复以上结构，为每个契约设计]
+[Repeat above structure for each contract]
 
 ---
 
-## 契约关系图
+## Contract Relationship Diagram
 
 ```
-[输入] ──ContractA──▶ [Node1] ──ContractB──▶ [Node2] ──ContractC──▶ [输出]
+[input] ──ContractA──▶ [Node1] ──ContractB──▶ [Node2] ──ContractC──▶ [output]
 ```
 
-## 设计说明
+## Design Notes
 
-### 唯一标识符设计
+### Unique Identifier Design
 
-每个输出契约的 `type` 字段确保唯一，用于 SubagentStop 匹配：
+Each output contract's `type` field ensures uniqueness for SubagentStop matching:
 
-| 契约 | type 值 |
-|------|---------|
-| [契约名] | [type值] |
+| Contract | type Value |
+|----------|------------|
+| [contract name] | [type value] |
 
-### 校验时机
+### Validation Timing
 
-| 契约 | 输入校验 | 输出校验 |
-|------|---------|---------|
-| [契约名] | [节点] | [节点] |
+| Contract | Input Validation | Output Validation |
+|----------|------------------|-------------------|
+| [contract name] | [node] | [node] |
 
-## 待确认项
+## Items Requiring Confirmation
 
-1. **[字段/规则]**: [需要确认的问题]
+1. **[Field/Rule]**: [Question requiring confirmation]
 ```
 
 **Quality Standards:**
