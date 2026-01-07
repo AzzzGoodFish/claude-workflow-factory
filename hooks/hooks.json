@@ -1,0 +1,17 @@
+{
+  "description": "Workflow Factory hooks for analyzing user input during workflow design",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Analyze user input for workflow factory context. Check if user is:\n1. Providing reference materials (file paths, URLs, document content)\n2. Describing workflow goals without materials\n3. Discussing/modifying node design\n4. Discussing/modifying flow design\n5. Discussing/modifying contract design\n6. Confirming to generate workflow\n7. Other general discussion\n\nReturn a brief hint in format:\n[WF-FACTORY-HINT]\nintent: <provide_resource|describe_goal|modify_nodes|modify_flow|modify_contracts|confirm_generate|general>\nsuggested_action: <brief suggestion for next step>\n[/WF-FACTORY-HINT]\n\nUser input: $USER_PROMPT",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}
