@@ -1,311 +1,311 @@
 ---
 name: resource-analysis
-description: This skill should be used when the user asks to "analyze reference materials", "extract workflow elements", "parse API documentation", "identify workflow entities", "extract data structures from documents", or needs to extract workflow design elements from user-provided materials such as API docs, requirements documents, process diagrams, or existing code.
+description: 当用户要求"分析参考资料"、"提取工作流要素"、"解析 API 文档"、"识别工作流实体"、"从文档中提取数据结构"，或需要从用户提供的资料（如 API 文档、需求文档、流程图、现有代码）中提取工作流设计要素时使用此 Skill。
 ---
 
-# Resource Analysis for Workflow Design
+# 工作流设计的资料分析
 
-Provides methodology for analyzing user-provided reference materials to extract workflow design elements.
+提供从用户提供的参考资料中提取工作流设计要素的方法论。
 
-## Purpose
+## 用途
 
-Extract actionable workflow design elements from various resource types:
-- API documentation
-- Requirements documents
-- Process descriptions
-- Existing code/scripts
-- Database schemas
-- Business rules
+从各类资源中提取可操作的工作流���计要素：
+- API 文档
+- 需求文档
+- 流程描述
+- 现有代码/脚本
+- 数据库 Schema
+- 业务规则
 
-## Element Extraction Framework
+## 要素提取框架
 
-### Target Elements
+### 目标要素
 
-| Element Type | What to Look For | Used In |
-|--------------|------------------|---------|
-| **Entities** | Nouns, data objects, resources | Contract design |
-| **Actions** | Verbs, operations, transformations | Node identification |
-| **Flows** | Sequences, dependencies, conditions | Flow design |
-| **Data Structures** | Fields, types, constraints | Schema definition |
-| **Rules** | Validations, business logic, constraints | Validator design |
+| 要素类型 | 关注点 | 用于 |
+|---------|--------|------|
+| **实体** | 名词、数据对象、资源 | Contract 设计 |
+| **操作** | 动词、运算、转换 | Node 识别 |
+| **流程** | 顺序、依赖、条件 | Flow 设计 |
+| **数据结构** | 字段、类型、约束 | Schema 定义 |
+| **规则** | 校验、业务逻辑、约束 | Validator 设计 |
 
-### Extraction Process
+### 提取流程
 
 ```
-1. Identify Resource Type
-   ├── API Documentation → Focus on endpoints, request/response schemas
-   ├── Requirements → Focus on user stories, acceptance criteria
-   ├── Process Description → Focus on steps, decisions, actors
-   ├── Code/Scripts → Focus on functions, data transformations
-   └── Database Schema → Focus on tables, relationships, constraints
+1. 识别资料类型
+   ├── API 文档 → 关注端点、请求/响应 Schema
+   ├── 需求文档 → 关注用户故事、验收标准
+   ├── 流程描述 → 关注步骤、决策点、参与者
+   ├── 代码/脚本 → 关注函数、数据转换
+   └── 数据库 Schema → 关注表、关系、约束
 
-2. Extract Raw Elements
-   ├── List all entities mentioned
-   ├── List all actions/operations
-   ├── Identify data flows
-   └── Note constraints and rules
+2. 提取原始要素
+   ├── 列出所有提及的实体
+   ├── 列出所有操作/行为
+   ├── 识别数据流
+   └── 记录约束和规则
 
-3. Map to Workflow Concepts
-   ├── Entities → Potential data contracts
-   ├── Actions → Potential workflow nodes
-   ├── Flows → Execution order and conditions
-   └── Rules → Validation logic
+3. 映射到工作流概念
+   ├── 实体 → 潜在的 Contract
+   ├── 操作 → 潜在的 Node
+   ├── 流程 → 执行顺序和条件
+   └── 规则 → 校验逻辑
 
-4. Organize Output
-   ├── Group related elements
-   ├── Identify dependencies
-   └── Highlight ambiguities for user confirmation
+4. 组织输出
+   ├── 分组相关要素
+   ├── 识别依赖关系
+   └── 标注需用户确认的歧义点
 ```
 
-## Resource Type Analysis
+## 资料类型分析
 
-### API Documentation
+### API 文档
 
-**Key patterns to identify:**
+**需识别的关键模式：**
 
-| Pattern | Workflow Element | Example |
-|---------|------------------|---------|
-| Endpoints | Potential nodes | `POST /reviews` → create-review node |
-| Request body | Input contract | JSON schema → Contract schema |
-| Response body | Output contract | JSON schema → Contract schema |
-| Status codes | Condition branches | `200 OK`, `400 Bad Request` → ?success, ?error |
-| Authentication | Context requirement | API key → Environment variable |
+| 模式 | 工作流要素 | 示例 |
+|------|-----------|------|
+| Endpoint | 潜在节点 | `POST /reviews` → create-review 节点 |
+| 请求体 | 输入 Contract | JSON Schema → Contract Schema |
+| 响应体 | 输出 Contract | JSON Schema → Contract Schema |
+| 状态码 | 条件分支 | `200 OK`, `400 Bad Request` → ?success, ?error |
+| 认证 | Context 需求 | API key → 环境变量 |
 
-**Extraction template:**
+**提取模板：**
 
 ```markdown
-## From API: [Endpoint Name]
+## 来自 API: [Endpoint 名称]
 
-### Identified Entity
-- Name: [entity name]
-- Operations: [CRUD operations available]
+### 识别的实体
+- 名称: [实体名称]
+- 操作: [可用的 CRUD 操作]
 
-### Potential Node
-- Name: [suggested node name]
-- Input: [request structure]
-- Output: [response structure]
+### 潜在节点
+- 名称: [建议的节点名]
+- 输入: [请求结构]
+- 输出: [响应结构]
 
-### Constraints
-- [validation rules from API spec]
+### 约束
+- [来自 API 规范的校验规则]
 ```
 
-### Requirements Document
+### 需求文档
 
-**Key patterns to identify:**
+**需识别的关键模式：**
 
-| Pattern | Workflow Element | Example |
-|---------|------------------|---------|
-| "User can..." | Node trigger | User can submit review → submission node |
-| "System should..." | Node action | System validates → validation node |
-| "When...then..." | Conditional flow | When valid, proceed → ?valid branch |
-| "Must have..." | Required field | Must have score → required in schema |
-| "Before...after..." | Sequential dependency | Before publish, review → a >> b |
+| 模式 | 工作流要素 | 示例 |
+|------|-----------|------|
+| "用户可以..." | 节点触发 | 用户可以提交评审 → submission 节点 |
+| "系统应该..." | 节点动作 | 系统校验 → validation 节点 |
+| "当...则..." | 条件流程 | 当有效时，继续 → ?valid 分支 |
+| "必须有..." | 必填字段 | 必须有评分 → Schema 中的 required |
+| "之前...之后..." | 顺序依赖 | 发布之前需评审 → a >> b |
 
-**Extraction template:**
+**提取模板：**
 
 ```markdown
-## From Requirement: [Requirement ID/Name]
+## 来自需求: [需求 ID/名称]
 
-### User Story
-[Original user story text]
+### 用户故事
+[原始用户故事文本]
 
-### Extracted Workflow Steps
-1. [Step from story] → [suggested node]
-2. [Step from story] → [suggested node]
+### 提取的工作流步骤
+1. [故事中的步骤] → [建议的节点]
+2. [故事中的步骤] → [建议的节点]
 
-### Data Requirements
-- [Required field]: [type] - [constraint]
+### 数据需求
+- [必填字段]: [类型] - [约束]
 
-### Business Rules
-- [Rule description] → [validation logic]
+### 业务规则
+- [规则描述] → [校验逻辑]
 ```
 
-### Process Description
+### 流程描述
 
-**Key patterns to identify:**
+**需识别的关键模式：**
 
-| Pattern | Workflow Element | Example |
-|---------|------------------|---------|
-| Sequential steps | Flow order | Step 1, Step 2 → a >> b |
-| Decision points | Conditional branch | If approved → ?approved |
-| Parallel activities | Parallel group | Meanwhile → [a, b] |
-| Loops | Iteration | For each item → * $items |
-| Actors | Node responsibility | Reviewer checks → reviewer node |
+| 模式 | 工作流要素 | 示例 |
+|------|-----------|------|
+| 顺序步骤 | 流程顺序 | 步骤1, 步骤2 → a >> b |
+| 决策点 | 条件分支 | 如果批准 → ?approved |
+| 并行活动 | 并行组 | 同时 → [a, b] |
+| 循环 | 迭代 | 对每个项目 → * $items |
+| 参与者 | 节点职责 | 审核员检查 → reviewer 节点 |
 
-**Extraction template:**
+**提取模板：**
 
 ```markdown
-## From Process: [Process Name]
+## 来自流程: [流程名称]
 
-### Process Flow
+### 流程图
 ```
-[Original process description or diagram]
+[原始流程描述或图表]
 ```
 
-### Suggested Flow DSL
+### 建议的 Flow DSL
 ```yaml
 flow: |
-  START >> [extracted flow] >> END
+  START >> [提取的流程] >> END
 ```
 
-### Identified Roles/Actors
-- [Actor] → [node responsibility]
+### 识别的角色/参与者
+- [参与者] → [节点职责]
 
-### Decision Points
-- [Decision] → [condition expression]
+### 决策点
+- [决策] → [条件表达式]
 ```
 
-### Existing Code/Scripts
+### 现有代码/脚本
 
-**Key patterns to identify:**
+**需识别的关键模式：**
 
-| Pattern | Workflow Element | Example |
-|---------|------------------|---------|
-| Functions | Potential nodes | `def process_data()` → processor node |
-| Input parameters | Input contract | Function args → Schema fields |
-| Return values | Output contract | Return type → Schema |
-| Conditionals | Branch conditions | `if status == 'ok'` → ?ok |
-| Loops | Iteration | `for item in items` → * $items |
-| Error handling | Error branches | `try/except` → ?error |
+| 模式 | 工作流要素 | 示例 |
+|------|-----------|------|
+| 函数 | 潜在节点 | `def process_data()` → processor 节点 |
+| 输入参数 | 输入 Contract | 函数参数 → Schema 字段 |
+| 返回值 | 输出 Contract | 返回类型 → Schema |
+| 条件语句 | 分支条件 | `if status == 'ok'` → ?ok |
+| 循环 | 迭代 | `for item in items` → * $items |
+| 错误处理 | 错误分支 | `try/except` → ?error |
 
-**Extraction template:**
+**提取模板：**
 
 ```markdown
-## From Code: [File/Function Name]
+## 来自代码: [文件/函数名称]
 
-### Function Analysis
-- Name: [function name]
-- Purpose: [what it does]
-- Input: [parameters with types]
-- Output: [return type]
+### 函数分析
+- 名称: [函数名]
+- 用途: [功能描述]
+- 输入: [参数及类型]
+- 输出: [返回类型]
 
-### Suggested Node
+### 建议的节点
 ```yaml
-name: [suggested name]
+name: [建议的名称]
 input:
-  contract: [derived from parameters]
+  contract: [从参数推导]
 output:
-  contract: [derived from return]
+  contract: [从返回值推导]
 ```
 
-### Logic to Preserve
-- [Key business logic that should be in prompt or validator]
+### 需保留的逻辑
+- [应放入 prompt 或 validator 的关键业务逻辑]
 ```
 
-## Output Format
+## 输出格式
 
-### Element Extraction Report
+### 要素提取报告
 
 ```markdown
 ---
 type: resource-analysis
 agent: wf-resource-analyzer
 timestamp: [ISO8601]
-source: [resource path/name]
+source: [资源路径/名称]
 ---
 
-## Resource Overview
+## 资料概述
 
-**Type**: [API Doc | Requirements | Process | Code | Schema]
-**Source**: [file path or URL]
-**Summary**: [brief description of what was analyzed]
+**类型**: [API 文档 | 需求文档 | 流程描述 | 代码 | Schema]
+**来源**: [文件路径或 URL]
+**摘要**: [简要描述分析内容]
 
-## Extracted Workflow Elements
+## 提取的工作流要素
 
-### Entities Identified
+### 识别的实体
 
-| Entity | Description | Suggested Contract |
-|--------|-------------|-------------------|
-| [name] | [what it represents] | [contract name] |
+| 实体 | 描述 | 建议的 Contract |
+|------|------|----------------|
+| [名称] | [表示什么] | [Contract 名称] |
 
-### Actions/Operations Identified
+### 识别的操作
 
-| Action | Input | Output | Suggested Node |
-|--------|-------|--------|----------------|
-| [action] | [data] | [data] | [node name] |
+| 操作 | 输入 | 输出 | 建议的节点 |
+|------|------|------|-----------|
+| [操作] | [数据] | [数据] | [节点名] |
 
-### Process Flow Identified
+### 识别的流程
 
-**Sequence:**
-1. [Step] → [node]
-2. [Step] → [node]
+**执行顺序:**
+1. [步骤] → [节点]
+2. [步骤] → [节点]
 
-**Conditions:**
-- [Condition] → [branch label]
+**条件分支:**
+- [条件] → [分支标签]
 
-**Suggested Flow DSL:**
+**建议的 Flow DSL:**
 ```yaml
 flow: |
-  [extracted flow]
+  [提取的流程]
 ```
 
-### Data Structures Identified
+### 识别的数据结构
 
-**[Structure Name]:**
+**[结构名称]:**
 ```yaml
 type: object
 properties:
-  [field]:
-    type: [type]
-    [constraints]
+  [字段]:
+    type: [类型]
+    [约束]
 ```
 
-### Validation Rules Identified
+### 识别的校验规则
 
-| Rule | Applies To | Validation Logic |
-|------|------------|------------------|
-| [rule name] | [entity/field] | [logic description] |
+| 规则 | 适用于 | 校验逻辑 |
+|------|--------|---------|
+| [规则名] | [实体/字段] | [逻辑描述] |
 
-## Ambiguities and Questions
+## 歧义点与问题
 
-Items requiring user clarification:
+需要用户澄清的事项：
 
-1. **[Topic]**: [Question for user]
-2. **[Topic]**: [Question for user]
+1. **[主题]**: [问题]
+2. **[主题]**: [问题]
 
-## Recommendations
+## 建议
 
-Based on analysis, suggested next steps:
+基于分析，建议的下一步：
 
-1. [Recommendation]
-2. [Recommendation]
+1. [建议]
+2. [建议]
 ```
 
-## Best Practices
+## 最佳实践
 
-### 1. Be Comprehensive but Organized
+### 1. 全面但有组织
 
-Extract all relevant elements, but organize them clearly:
-- Group by type (entities, actions, flows, data, rules)
-- Show relationships between elements
-- Highlight dependencies
+提取所有相关要素，但要组织清晰：
+- 按类型分组（实体、操作、流程、数据、规则）
+- 展示要素间的关系
+- 标注依赖关系
 
-### 2. Preserve Original Context
+### 2. 保留原始上下文
 
-When extracting:
-- Quote relevant original text
-- Reference source locations
-- Note assumptions made
+提取时：
+- 引用相关原文
+- 标注来源位置
+- 记录所做的假设
 
-### 3. Flag Ambiguities
+### 3. 明确标注歧义
 
-Explicitly note:
-- Missing information
-- Unclear requirements
-- Multiple interpretations
-- Assumptions made
+显式记录：
+- 缺失的信息
+- 不明确的需求
+- 多种可能的解释
+- 所做的假设
 
-### 4. Suggest, Don't Dictate
+### 4. 建议而非决定
 
-Present extractions as suggestions:
-- "Suggested node name: ..."
-- "This could map to ..."
-- "Consider whether ..."
+以建议的方式呈现：
+- "建议的节点名: ..."
+- "这可以映射到..."
+- "考虑是否..."
 
-### 5. Focus on Workflow-Relevant Elements
+### 5. 聚焦工作流相关要素
 
-Prioritize elements that directly map to:
-- Contracts (data structures)
-- Nodes (execution units)
-- Flow (execution order)
-- Context (environment needs)
+优先提取直接映射到以下概念的要素：
+- Contract（数据结构）
+- Node（执行单元）
+- Flow（执行顺序）
+- Context（环境需求）

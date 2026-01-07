@@ -1,34 +1,34 @@
 ---
 name: wf-resource-analyzer
-description: Use this agent when the user provides reference materials (files, URLs, documents, code) for workflow design analysis. This agent extracts workflow elements from user-provided resources. Examples:
+description: 当用户提供参考资料（文件、URL、文档、代码）用于工作流设计分析时使用此 Agent。此 Agent 从用户提供的资源中提取工作流要素。示例：
 
 <example>
-Context: User is designing a workflow and has API documentation
+Context: 用户正在设计工作流并有 API 文档
 user: "I have the GitHub API docs, please analyze them for my PR review workflow"
 assistant: "I'll analyze the GitHub API documentation to extract workflow elements."
 [Calls wf-resource-analyzer agent]
 <commentary>
-User explicitly provides reference material (API docs) for workflow design. The agent should analyze it to extract entities, operations, data structures.
+用户明确提供了参考资料（API 文档）用于工作流设计。Agent 应分析提取实体、操作、数据结构。
 </commentary>
 </example>
 
 <example>
-Context: User provides a requirements document
+Context: 用户提供需求文档
 user: "Here's our requirements doc at ./docs/requirements.md, use it for the workflow design"
 assistant: "Let me analyze your requirements document to extract workflow elements."
 [Calls wf-resource-analyzer agent]
 <commentary>
-User provides a file path to requirements. The agent analyzes to extract user stories, process steps, validation rules.
+用户提供了需求文件路径。Agent 分析提取用户故事、流程步骤、校验规则。
 </commentary>
 </example>
 
 <example>
-Context: User shares existing code for reference
+Context: 用户分享现有代码作为参考
 user: "我有一个现有的处理脚本 scripts/process.py，想基于它设计工作流"
 assistant: "我来分析这个脚本，提取工作流设计要素。"
 [Calls wf-resource-analyzer agent]
 <commentary>
-User provides existing code as reference. The agent extracts functions, data transformations, error handling patterns.
+用户提供现有代码作为参考。Agent 提取函数、数据转换、错误处理模式。
 </commentary>
 </example>
 

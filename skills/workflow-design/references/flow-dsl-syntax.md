@@ -9,50 +9,50 @@
 >
 > 扩展内容标注为 `[扩展]`。
 
-## Basic Syntax
+## 基础语法
 
-### Symbols Overview
+### 符号概览
 
-| Symbol | Meaning | Example | Description |
-|--------|---------|---------|-------------|
-| `>>` | Sequential dependency | `a >> b >> c` | a completes, then b, then c |
-| `[a, b]` | Parallel group | `x >> [a, b] >> y` | a and b run in parallel, y waits for all |
-| `?label` | Conditional branch | `a ?ok >> b` | Execute b when a output satisfies ok condition |
-| `* $var` | Loop iteration | `a * $items` | Execute a for each item in $items |
-| `* $var[n]` | Parallel loop | `a * $items[3]` | Parallel iteration with degree 3 |
-| `START` | Entry point | `START >> a` | Workflow entry |
-| `END` | Exit point | `a >> END` | Workflow exit |
+| 符号 | 含义 | 示例 | 说明 |
+|------|------|------|------|
+| `>>` | 顺序依赖 | `a >> b >> c` | a 完成后执行 b，然后 c |
+| `[a, b]` | 并行组 | `x >> [a, b] >> y` | a 和 b 并行执行，y 等待所有完成 |
+| `?label` | 条件分支 | `a ?ok >> b` | 当 a 的输出满足 ok 条件时执行 b |
+| `* $var` | 循环迭代 | `a * $items` | 对 $items 中的每个元素执行 a |
+| `* $var[n]` | 并行循环 | `a * $items[3]` | 并行度为 3 的循环迭代 |
+| `START` | 入口点 | `START >> a` | 工作流入口 |
+| `END` | 出口点 | `a >> END` | 工作流出口 |
 
-## Detailed Syntax Rules
+## 详细语法规则
 
-### 1. Sequential Execution
+### 1. 顺序执行
 
 ```yaml
 flow: |
   START >> step-a >> step-b >> step-c >> END
 ```
 
-Execution order: START → step-a → step-b → step-c → END
+执行顺序: START → step-a → step-b → step-c → END
 
-### 2. Parallel Execution
+### 2. 并行执行
 
 ```yaml
 flow: |
-  # Parallel start
+  # 并行启动
   START >> [collect-a, collect-b, collect-c] >> merge >> END
 
-  # Equivalent to:
+  # 等同于:
   # START → collect-a ─┐
   # START → collect-b ─┼→ merge → END
   # START → collect-c ─┘
 ```
 
-**Rules:**
-- All nodes in `[]` start simultaneously
-- Next node waits for all parallel nodes to complete
-- No order guarantee within parallel group
+**规则:**
+- `[]` 中的所有节点同时启动
+- 下一个节点等待所有并行节点完成
+- 并行组内无执行顺序保证
 
-### 3. Conditional Branching
+### 3. 条件分支
 
 ```yaml
 flow: |
@@ -68,34 +68,34 @@ conditions:
     unknown: "output.confidence < 0.8"
 ```
 
-**Rules:**
-- Use `?label` to specify condition name
-- Conditions defined in `conditions` section
-- Condition expression evaluates node output
-- Multiple conditions can match (non-exclusive)
+**规则:**
+- 使用 `?label` 指定条件名称
+- 条件在 `conditions` 部分定义
+- 条件表达式评估节点输出
+- 多个条件可以同时匹配（非互斥）
 
-### 4. Loop Iteration
+### 4. 循环迭代
 
 ```yaml
 flow: |
-  # Sequential loop
+  # 顺序循环
   START >> processor * $files >> merge >> END
 
-  # Parallel loop (max 3 concurrent)
+  # 并行循环（最多 3 个并发）
   START >> processor * $files[3] >> merge >> END
 
-  # Loop + condition
+  # 循环 + 条件
   START >> validator * $items >> check ?all_valid >> finalize >> END
   check ?has_errors >> error-report >> END
 ```
 
-**Rules:**
-- `* $var` iterates over state variable
-- `* $var[n]` specifies parallel degree n
-- Loop variable available to node via context
-- Next node waits for all iterations to complete
+**规则:**
+- `* $var` 遍历状态变量
+- `* $var[n]` 指定并行度 n
+- 循环变量通过 context 传递给节点
+- 下一个节点等待所有迭代完成
 
-### 5. Combining Patterns
+### 5. 组合模式
 
 ```yaml
 name: code-review-workflow
@@ -106,12 +106,12 @@ state:
   reviews: []
 
 flow: |
-  # Main flow: fetch PR → parallel checks → analyze → handle results
+  # 主流程: 获取 PR → 并行检查 → 分析 → 处理结果
   START >> fetch-pr >> [lint, test, security] >> analyze
   analyze ?issues >> generate-fixes >> END
   analyze ?clean >> approve >> END
 
-  # File-level review: parallel review for each file
+  # 文件级评审: 对每个文件并行评审
   fetch-pr >> reviewer * $files[3] >> summarize >> END
 
 conditions:
@@ -124,22 +124,22 @@ execution:
   timeout: 1800
 ```
 
-## Flow File Structure
+## Flow 文件结构
 
-### Complete Format
+### 完整格式
 
 ```yaml
-# Workflow metadata
+# 工作流元数据
 name: workflow-name
 version: "1.0"
-description: Workflow description
+description: 工作流描述
 
-# State definition (optional)
+# 状态定义（可选）
 state:
   items: []
   result: null
 
-# Flow definition
+# 流程定义
 flow: |
   START >> fetch-data >> [validate, transform] >> process >> END
   process ?success >> finalize >> END
@@ -147,51 +147,51 @@ flow: |
   process ?fail >> error-handler >> END
   batch-processor * $items[3] >> merge >> END
 
-# Condition definitions (when using conditional branches)
+# 条件定义（使用条件分支时）
 conditions:
   process:
     success: "output.status == 'ok'"
     retry: "output.retry_count < 3"
     fail: "output.status == 'error'"
 
-# Execution configuration
+# 执行配置
 execution:
   max_parallel: 3
   timeout: 3600
 ```
 
-### Field Description
+### 字段说明
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | Yes | Workflow name |
-| `version` | string | Yes | Version number |
-| `description` | string | No | Workflow description |
-| `state` | object | No | Initial state variables |
-| `flow` | string | Yes | Flow DSL definition |
-| `conditions` | object | No | Condition expressions |
-| `execution` | object | No | Execution configuration |
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `name` | string | 是 | 工作流名称 |
+| `version` | string | 是 | 版本号 |
+| `description` | string | 否 | 工作流描述 |
+| `state` | object | 否 | 初始状态变量 |
+| `flow` | string | 是 | Flow DSL 定义 |
+| `conditions` | object | 否 | 条件表达式 |
+| `execution` | object | 否 | 执行配置 |
 
-## Output Formats
+## 输出格式
 
-Flow definitions can automatically convert to three formats for different scenarios.
+Flow 定义可自动转换为三种格式，适用于不同场景。
 
-### 1. Mermaid Diagram (Visualization)
+### 1. Mermaid 图（可视化）
 
-**Original Flow:**
+**原始 Flow:**
 ```yaml
 flow: |
   START >> [collect-a, collect-b] >> process ?ok >> finalize >> END
   process ?fail >> error-handler >> END
 ```
 
-**Generated Mermaid:**
+**生成的 Mermaid:**
 ```mermaid
 flowchart LR
     START --> collect-a
     START --> collect-b
 
-    subgraph parallel_1[Parallel Collection]
+    subgraph parallel_1[并行收集]
         collect-a
         collect-b
     end
@@ -203,31 +203,31 @@ flowchart LR
     process -->|fail| error-handler --> END
 ```
 
-### 2. Structured Text (Agent Understanding)
+### 2. 结构化文本（Agent 理解）
 
 ```
-Workflow: code-review-workflow
+工作流: code-review-workflow
 
-Execution Path:
+执行路径:
 1. START → fetch-pr
-2. fetch-pr → [lint, test, security] (parallel, wait for all)
+2. fetch-pr → [lint, test, security] (并行，等待全部完成)
 3. [lint, test, security] → analyze
-4. analyze branches:
-   - Condition "issues" (issue_count > 0): → generate-fixes → END
-   - Condition "clean" (issue_count == 0): → approve → END
-5. fetch-pr → reviewer (loop: $files, parallel: 3) → summarize → END
+4. analyze 分支:
+   - 条件 "issues" (issue_count > 0): → generate-fixes → END
+   - 条件 "clean" (issue_count == 0): → approve → END
+5. fetch-pr → reviewer (循环: $files, 并行度: 3) → summarize → END
 
-Dependencies:
-- fetch-pr: no dependencies
-- lint, test, security: depends on fetch-pr
-- analyze: depends on lint, test, security (all complete)
-- generate-fixes: depends on analyze (condition: issues)
-- approve: depends on analyze (condition: clean)
-- reviewer: depends on fetch-pr (loop)
-- summarize: depends on reviewer (loop complete)
+依赖关系:
+- fetch-pr: 无依赖
+- lint, test, security: 依赖 fetch-pr
+- analyze: 依赖 lint, test, security（全部完成）
+- generate-fixes: 依赖 analyze（条件: issues）
+- approve: 依赖 analyze（条件: clean）
+- reviewer: 依赖 fetch-pr（循环）
+- summarize: 依赖 reviewer（循环完成）
 ```
 
-### 3. DAG JSON (Programmatic Processing)
+### 3. DAG JSON（程序化处理）
 
 ```json
 {
@@ -271,61 +271,61 @@ Dependencies:
 }
 ```
 
-## Conversion Rules
+## 转换规则
 
 ### Flow → Mermaid
 
-| Flow Syntax | Mermaid Syntax | Description |
-|-------------|----------------|-------------|
-| `a >> b` | `a --> b` | Direct mapping |
-| `a >> [b, c]` | `a --> b` + `a --> c` + `subgraph` | Expand parallel, add subgraph |
-| `[a, b] >> c` | `a --> c` + `b --> c` | Convergence |
-| `a ?label >> b` | `a -->\|label\| b` | Condition label |
-| `a * $items` | `subgraph loop` + comment | Loop subgraph |
-| `a * $items[n]` | `subgraph loop[∀ item ×n]` | Parallel loop subgraph |
+| Flow 语法 | Mermaid 语法 | 说明 |
+|-----------|--------------|------|
+| `a >> b` | `a --> b` | 直接映射 |
+| `a >> [b, c]` | `a --> b` + `a --> c` + `subgraph` | 展开并行，添加子图 |
+| `[a, b] >> c` | `a --> c` + `b --> c` | 汇聚 |
+| `a ?label >> b` | `a -->\|label\| b` | 条件标签 |
+| `a * $items` | `subgraph loop` + 注释 | 循环子图 |
+| `a * $items[n]` | `subgraph loop[∀ item ×n]` | 并行循环子图 |
 
-## Condition Expression Syntax [扩展]
+## 条件表达式语法 [扩展]
 
 > 以下运算符和字段访问语法为扩展内容，源文档仅给出简单示例。
 
-### Supported Operators
+### 支持的运算符
 
-| Operator | Description | Example |
-|----------|-------------|---------|
-| `==` | Equal | `output.status == 'ok'` |
-| `!=` | Not equal | `output.status != 'error'` |
-| `>` | Greater than | `output.count > 0` |
-| `<` | Less than | `output.count < 10` |
-| `>=` | Greater or equal | `output.score >= 80` |
-| `<=` | Less or equal | `output.score <= 100` |
-| `in` | Contains | `'error' in output.messages` |
-| `and` | Logical AND | `output.valid and output.complete` |
-| `or` | Logical OR | `output.retry or output.skip` |
-| `not` | Logical NOT | `not output.error` |
+| 运算符 | 说明 | 示例 |
+|--------|------|------|
+| `==` | 相等 | `output.status == 'ok'` |
+| `!=` | 不相等 | `output.status != 'error'` |
+| `>` | 大于 | `output.count > 0` |
+| `<` | 小于 | `output.count < 10` |
+| `>=` | 大于等于 | `output.score >= 80` |
+| `<=` | 小于等于 | `output.score <= 100` |
+| `in` | 包含 | `'error' in output.messages` |
+| `and` | 逻辑与 | `output.valid and output.complete` |
+| `or` | 逻辑或 | `output.retry or output.skip` |
+| `not` | 逻辑非 | `not output.error` |
 
-### Accessing Output Fields
+### 访问输出字段
 
 ```yaml
 conditions:
   node-name:
-    # Access simple field
+    # 访问简单字段
     simple: "output.status == 'ok'"
 
-    # Access nested field
+    # 访问嵌套字段
     nested: "output.result.score > 80"
 
-    # Access array length
+    # 访问数组长度
     array: "len(output.items) > 0"
 
-    # Access array element
+    # 访问数组元素
     element: "output.items[0].valid"
 ```
 
-## Error Handling Patterns [扩展]
+## 错误处理模式 [扩展]
 
 > 以下错误处理模式为扩展内容，基于工作流设计最佳实践补充。
 
-### Retry Pattern
+### Retry 模式
 
 ```yaml
 flow: |
@@ -337,7 +337,7 @@ conditions:
     retry: "output.status == 'retry' and output.attempt < 3"
 ```
 
-### Fallback Pattern
+### Fallback 模式
 
 ```yaml
 flow: |
@@ -349,7 +349,7 @@ conditions:
     fail: "output.status == 'error'"
 ```
 
-### Circuit Breaker Pattern
+### Circuit Breaker 模式
 
 ```yaml
 flow: |
@@ -361,59 +361,59 @@ conditions:
     unhealthy: "output.error_rate > 0.5"
 ```
 
-## Best Practices [扩展]
+## 最佳实践 [扩展]
 
 > 以下最佳实践为扩展内容，基于工作流设计经验补充。
 
-### 1. Clear Naming
+### 1. 清晰命名
 
 ```yaml
-# Good: Descriptive names
+# 好：描述性名称
 flow: |
   START >> fetch-user-data >> validate-schema >> transform-format >> END
 
-# Avoid: Ambiguous names
+# 避免：模糊名称
 flow: |
   START >> step1 >> step2 >> step3 >> END
 ```
 
-### 2. Appropriate Grouping
+### 2. 合理分组
 
 ```yaml
-# Good: Logical parallel groups
+# 好：逻辑相关的并行组
 flow: |
   START >> [lint-code, run-tests, check-security] >> merge-results >> END
 
-# Avoid: Unrelated parallel execution
+# 避免：不相关的并行执行
 flow: |
   START >> [fetch-data, send-email] >> END
 ```
 
-### 3. Explicit Error Handling
+### 3. 显式错误处理
 
 ```yaml
-# Good: Handle all outcomes
+# 好：处理所有可能的结果
 flow: |
   START >> process >> END
   process ?success >> notify-success >> END
   process ?failure >> notify-failure >> END
   process ?timeout >> retry >> process
 
-# Avoid: Implicit error handling
+# 避免：隐式错误处理
 flow: |
   START >> process >> END
 ```
 
-### 4. Condition Clarity
+### 4. 条件清晰
 
 ```yaml
-# Good: Clear condition expressions
+# 好：清晰的条件表达式
 conditions:
   analyze:
     has_issues: "output.issue_count > 0"
     is_clean: "output.issue_count == 0 and output.warnings == 0"
 
-# Avoid: Complex inline conditions
+# 避免：复杂的内联条件
 conditions:
   analyze:
     check: "output.a > 0 and (output.b < 10 or output.c == 'x') and not output.d"

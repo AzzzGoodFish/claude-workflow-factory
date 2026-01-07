@@ -1,34 +1,34 @@
 ---
 name: wf-researcher
-description: Use this agent when the user describes a workflow goal but has no reference materials to provide. This agent researches and proposes workflow designs based on best practices and common patterns. Examples:
+description: 当用户描述了工作流目标但没有参考资料时使用此 Agent。此 Agent 基于最佳实践和常见模式研究并提出工作流设计方案。示例：
 
 <example>
-Context: User wants to create a workflow but has no documentation
+Context: 用户想创建工作流但没有文档
 user: "I want to create a code review workflow that automatically checks PRs"
 assistant: "Let me research code review workflow patterns and propose a design."
 [Calls wf-researcher agent]
 <commentary>
-User describes goal without providing materials. The agent should research patterns and propose a workflow structure.
+用户描述了目标但没有提供参考资料。Agent 应该研究模式并提出工作流结构。
 </commentary>
 </example>
 
 <example>
-Context: User has a vague idea and needs guidance
+Context: 用户有模糊的想法需要指导
 user: "我想做一个数据处理的工作流，但不太确定怎么设计"
 assistant: "让我调研数据处理工作流的常见模式，为你提供设计建议。"
 [Calls wf-researcher agent]
 <commentary>
-User has unclear requirements. The agent researches patterns and provides structured proposals for user feedback.
+用户需求不明确。Agent 研究模式并提供结构化方案供用户反馈。
 </commentary>
 </example>
 
 <example>
-Context: User wants to understand options before deciding
+Context: 用户在决定前想了解可选方案
 user: "What are the common approaches for building a CI/CD workflow?"
 assistant: "I'll research CI/CD workflow patterns and present options."
 [Calls wf-researcher agent]
 <commentary>
-User asks about approaches. The agent provides research on common patterns with pros/cons for decision making.
+用户询问可选方案。Agent 研究常见模式并分析优缺点以便决策。
 </commentary>
 </example>
 

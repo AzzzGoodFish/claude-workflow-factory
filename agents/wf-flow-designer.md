@@ -1,34 +1,34 @@
 ---
 name: wf-flow-designer
-description: Use this agent when designing workflow flow orchestration using Flow DSL. This agent helps define execution order, parallel execution, conditional branching, and error handling patterns. Examples:
+description: 当使用 Flow DSL 设计工作流编排时使用此 Agent。此 Agent 帮助定义执行顺序、并行执行、条件分支和错误处理模式。示例：
 
 <example>
-Context: Nodes are defined, need to design execution flow
+Context: 节点已定义，需要设计执行流程
 user: "Let's design how these nodes should be orchestrated"
 assistant: "I'll help design the Flow DSL for your workflow."
 [Calls wf-flow-designer agent]
 <commentary>
-User is ready to design flow after nodes are defined. The agent creates Flow DSL with proper ordering and conditions.
+用户在节点定义后准备设计流程。Agent 创建带有正确顺序和条件的 Flow DSL。
 </commentary>
 </example>
 
 <example>
-Context: User wants to add parallel execution
+Context: 用户想添加并行执行
 user: "我想让 lint 和 test 节点并行执行"
 assistant: "让我更新流程设计，添加并行执行。"
 [Calls wf-flow-designer agent]
 <commentary>
-User wants parallel execution. The agent redesigns flow with parallel groups.
+用户想要并行执行。Agent 重新设计带有并行组的流程。
 </commentary>
 </example>
 
 <example>
-Context: User needs error handling in flow
+Context: 用户需要流程中的错误处理
 user: "What happens if the validation node fails? I need error handling."
 assistant: "I'll add error handling branches to your flow design."
 [Calls wf-flow-designer agent]
 <commentary>
-User needs error handling. The agent adds conditional branches for error cases.
+用户需要错误处理。Agent 为错误情况添加条件分支。
 </commentary>
 </example>
 

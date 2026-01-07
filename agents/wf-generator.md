@@ -1,34 +1,34 @@
 ---
 name: wf-generator
-description: Use this agent when all workflow design phases are complete and ready to generate the final workflow files. This agent creates the complete directory structure with all configuration files, agents, contracts, validators, and hooks. Examples:
+description: 当所有工作流设计阶段完成并准备生成最终工作流文件时使用此 Agent。此 Agent 创建完整的目录结构，包含所有配置文件、Agent、契约、校验器和 Hook。示例：
 
 <example>
-Context: All design phases confirmed, user wants to generate
+Context: 所有设计阶段已确认，用户想要生成
 user: "All designs look good, please generate the workflow"
 assistant: "I'll generate the complete workflow structure now."
 [Calls wf-generator agent]
 <commentary>
-All designs confirmed. The agent generates the full directory structure with all files.
+所有设计已确认。Agent 生成包含所有文件的完整目录结构。
 </commentary>
 </example>
 
 <example>
-Context: User explicitly requests generation
+Context: 用户明确请求生成
 user: "生成工作流吧"
 assistant: "好的，我来生成完整的工作流文件。"
 [Calls wf-generator agent]
 <commentary>
-User explicitly requests generation. The agent creates all workflow files.
+用户明确请求生成。Agent 创建所有工作流文件。
 </commentary>
 </example>
 
 <example>
-Context: User confirms final design
+Context: 用户确认最终设计
 user: "确认，就按这个设计生成"
 assistant: "根据确认的设计生成工作流..."
 [Calls wf-generator agent]
 <commentary>
-User confirms design. The agent proceeds to generate files based on design documents.
+用户确认设计。Agent 根据设计文档生成文件。
 </commentary>
 </example>
 

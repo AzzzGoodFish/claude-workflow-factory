@@ -1,40 +1,40 @@
 ---
 name: workflow-design
-description: This skill should be used when the user asks about "workflow design", "Contract definition", "Node design", "Flow DSL", "SubAgent workflow", "workflow validation", or needs guidance on AI workflow architecture, data contracts, node orchestration, or Claude Code workflow implementation patterns.
+description: 当用户询问"工作流设计"、"Contract 定义"、"Node 设计"、"Flow DSL"、"SubAgent 工作流"、"工作流校验"，或需要关于 AI 工作流架构、数据契约、节点编排、Claude Code 工作流实现模式的指导时使用此 Skill。
 ---
 
-# Workflow Design Knowledge
+# 工作流设计知识
 
-Provides guidance for designing AI-driven workflows based on the 4 core concepts: Contract, Nodes, Flow, and Context.
+提供基于 4 个核心概念设计 AI 驱动工作流的指导：Contract、Node、Flow 和 Context。
 
-## Core Concepts Overview
+## 核心概念概览
 
-AI workflows consist of 4 fundamental concepts:
+AI 工作流由 4 个基本概念组成：
 
-| Concept | Question Answered | Claude Code Mapping |
-|---------|-------------------|---------------------|
-| **Contract** | What does data look like? How to validate? | YAML Schema + Python Validator |
-| **Nodes** | Who executes? What are inputs/outputs? | SubAgent (`.claude/agents/*.md`) |
-| **Flow** | In what order? What if errors? | DSL (`flow.yaml`) |
-| **Context** | What environment info needed? | Environment variables + context files |
+| 概念 | 回答的问题 | Claude Code 映射 |
+|------|-----------|-----------------|
+| **Contract** | 数据长什么样？如何校验？ | YAML Schema + Python Validator |
+| **Node** | 谁执行？输入输出是什么？ | SubAgent (`.claude/agents/*.md`) |
+| **Flow** | 什么顺序？出错怎么办？ | DSL (`flow.yaml`) |
+| **Context** | 需要什么环境信息？ | 环境变量 + context 文件 |
 
-## Contract Design
+## Contract 设计
 
-Contracts define data structure specifications and validation rules.
+Contract 定义数据结构规范和校验规则。
 
-### Contract Components
+### Contract 组件
 
-| Component | Purpose | Required |
-|-----------|---------|----------|
-| Schema | Data structure definition (JSON Schema) | Yes |
-| Validator | Runtime validation function | Yes |
-| Examples | Sample data for testing/prompts | Recommended |
+| 组件 | 用途 | 是否必需 |
+|------|------|---------|
+| Schema | 数据结构定义（JSON Schema） | 是 |
+| Validator | 运行时校验函数 | 是 |
+| Examples | 用于测试/prompt 的示例数据 | 推荐 |
 
-### Contract File Format
+### Contract 文件格式
 
 ```yaml
 name: ContractName
-description: Contract purpose
+description: 契约用途
 version: "1.0"
 
 schema:
@@ -52,23 +52,23 @@ examples:
   - path: examples/sample.json
 ```
 
-### Validation Timing
+### 校验时机
 
-| Timing | Trigger | Content | On Failure |
-|--------|---------|---------|------------|
-| Input validation | Before node execution | Input contract | Block execution |
-| Output validation | After node execution | Output contract | Trigger retry or error handling |
+| 时机 | 触发点 | 校验内容 | 失败处理 |
+|------|--------|---------|---------|
+| 输入校验 | 节点执行前 | 输入 Contract | 阻止执行 |
+| 输出校验 | 节点执行后 | 输出 Contract | 触发重试或错误处理 |
 
-## Node Design
+## Node 设计
 
-Nodes are workflow execution units, implemented as SubAgents in Claude Code.
+Node 是工作流执行单元，在 Claude Code 中实现为 SubAgent。
 
-### Node Definition Format
+### Node 定义格式
 
 ```markdown
 ---
 name: node-name
-description: Node purpose
+description: 节点用途
 tools: Read, Write, Bash, Glob
 
 input:
@@ -84,16 +84,16 @@ output:
 <System Prompt>
 ```
 
-### Design Principles
+### 设计原则
 
-1. **Single Responsibility** - Each node does one thing
-2. **Explicit I/O** - Define through contracts, no implicit dependencies
-3. **Independently Testable** - Validate output given input
-4. **Idempotent** - Same input produces same output (when possible)
+1. **单一职责** - 每个节点只做一件事
+2. **显式 I/O** - 通过 Contract 定义，无隐式依赖
+3. **可独立测试** - 给定输入可验证输出
+4. **幂等性** - 相同输入产生相同输出（尽可能）
 
-### Output Format
+### 输出格式
 
-All SubAgent outputs use Markdown with frontmatter:
+所有 SubAgent 输出使用带 frontmatter 的 Markdown：
 
 ```markdown
 ---
@@ -102,28 +102,28 @@ agent: agent-name
 timestamp: 2026-01-07T10:00:00Z
 ---
 
-## Content
+## 内容
 
 ...
 ```
 
-## Flow Design
+## Flow 设计
 
-Flow defines execution control rules using a concise DSL.
+Flow 使用简洁的 DSL 定义执行控制规则。
 
-### DSL Syntax
+### DSL 语法
 
-| Symbol | Meaning | Example |
-|--------|---------|---------|
-| `>>` | Sequential | `a >> b >> c` |
-| `[a, b]` | Parallel group | `x >> [a, b] >> y` |
-| `?label` | Conditional branch | `a ?ok >> b` |
-| `* $var` | Loop iteration | `a * $items` |
-| `* $var[n]` | Parallel loop | `a * $items[3]` |
-| `START` | Entry point | `START >> a` |
-| `END` | Exit point | `a >> END` |
+| 符号 | 含义 | 示例 |
+|------|------|------|
+| `>>` | 顺序执行 | `a >> b >> c` |
+| `[a, b]` | 并行组 | `x >> [a, b] >> y` |
+| `?label` | 条件分支 | `a ?ok >> b` |
+| `* $var` | 循环迭代 | `a * $items` |
+| `* $var[n]` | 并行循环 | `a * $items[3]` |
+| `START` | 入口点 | `START >> a` |
+| `END` | 出口点 | `a >> END` |
 
-### Flow File Format
+### Flow 文件格式
 
 ```yaml
 name: workflow-name
@@ -144,21 +144,21 @@ execution:
   timeout: 3600
 ```
 
-### Common Patterns
+### 常见模式
 
-**Sequential execution:**
+**顺序执行:**
 ```yaml
 flow: |
   START >> step-a >> step-b >> step-c >> END
 ```
 
-**Parallel execution:**
+**并行执行:**
 ```yaml
 flow: |
   START >> [collect-a, collect-b] >> merge >> END
 ```
 
-**Conditional branching:**
+**条件分支:**
 ```yaml
 flow: |
   START >> analyze >> END
@@ -166,74 +166,74 @@ flow: |
   analyze ?clean >> approve >> END
 ```
 
-**Loop iteration:**
+**循环迭代:**
 ```yaml
 flow: |
   START >> processor * $files[3] >> merge >> END
 ```
 
-## Context Design
+## Context 设计
 
-Context defines environment information and shared state.
+Context 定义环境信息和共享状态。
 
-### Context Components
+### Context 组件
 
-| Component | Purpose | Required |
-|-----------|---------|----------|
-| Environment variables | Execution parameters | Yes |
-| Shared state | State passed between nodes | Optional |
-| Storage layout | Intermediate artifact locations | Yes |
+| 组件 | 用途 | 是否必需 |
+|------|------|---------|
+| 环境变量 | 执行参数 | 是 |
+| 共享状态 | 节点间传递的状态 | 可选 |
+| 存储布局 | 中间产物位置 | 是 |
 
-### Storage Layout Convention
+### 存储布局约定
 
 ```
 $WORKDIR/
-└── .context/                # Intermediate outputs
+└── .context/                # 中间输出
     ├── node-a.md
     ├── node-b.md
     └── ...
 ```
 
-## AI Workflow Special Considerations
+## AI 工作流特殊考量
 
-### Differences from Traditional Workflows
+### 与传统工作流的区别
 
-| Aspect | Traditional | AI Workflow |
-|--------|-------------|-------------|
-| Output determinism | Deterministic | Non-deterministic |
-| Validation necessity | Optional | Required |
-| Error types | Exceptions | Format errors, semantic errors, hallucinations |
-| Retry strategy | Simple retry | Retry with feedback |
+| 方面 | 传统工作流 | AI 工作流 |
+|------|-----------|----------|
+| 输出确定性 | 确定性 | 非确定性 |
+| 校验必要性 | 可选 | 必需 |
+| 错误类型 | 异常 | 格式错误、语义错误、幻觉 |
+| 重试策略 | 简单重试 | 带反馈重试 |
 
-### AI-Specific Design Points
+### AI 特有设计要点
 
-1. **Validators are mandatory** - Never trust AI output
-2. **Retry with feedback** - Pass validation errors back to Agent
-3. **Example-driven** - Provide clear output examples in prompts
-4. **Progressive refinement** - Split complex tasks into simple nodes
+1. **校验器必不可少** - 永远不要信任 AI 输出
+2. **带反馈重试** - 将校验错误传回 Agent
+3. **示例驱动** - 在 prompt 中提供清晰的输出示例
+4. **渐进式细化** - 将复杂任务拆分为简单节点
 
-## Additional Resources
+## 扩展资源
 
-### Reference Files
+### 参考文件
 
-For detailed patterns and syntax, consult:
-- **`references/ai-workflow-principles.md`** - Complete design principles
-- **`references/cc-workflow-mapping.md`** - Claude Code implementation details
-- **`references/flow-dsl-syntax.md`** - Complete Flow DSL reference
+详细模式和语法请参阅：
+- **`references/ai-workflow-principles.md`** - 完整设计原则
+- **`references/cc-workflow-mapping.md`** - Claude Code 实现细节
+- **`references/flow-dsl-syntax.md`** - 完整 Flow DSL 参考
 
-### Quick Decision Guide
+### 快速决策指南
 
-**When to split nodes:**
-- Task requires multiple distinct skills
-- Output needs different validation rules
-- Want parallel execution capability
+**何时拆分节点：**
+- 任务需要多种不同技能
+- 输出需要不同的校验规则
+- 需要并行执行能力
 
-**When to use contracts:**
-- Data flows between nodes
-- Need to validate AI output
-- Want consistent data structure
+**何时使用 Contract：**
+- 数据在节点间流动
+- 需要校验 AI 输出
+- 需要一致的数据结构
 
-**When to use conditional flow:**
-- Different paths based on output
-- Error handling needed
-- Quality gates required
+**何时使用条件流程：**
+- 根据输出走不同路径
+- 需要错误处理
+- 需要质量门控

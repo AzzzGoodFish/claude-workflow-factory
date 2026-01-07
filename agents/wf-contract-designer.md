@@ -1,34 +1,34 @@
 ---
 name: wf-contract-designer
-description: Use this agent when designing data contracts (schemas and validators) for workflow nodes. This agent helps define data structures, validation rules, and contract specifications. Examples:
+description: 当为工作流节点设计数据契约（Schema 和 Validator）时使用此 Agent。此 Agent 帮助定义数据结构、校验规则和契约规范。示例：
 
 <example>
-Context: Workflow nodes are defined, need to design contracts
+Context: 节点已定义，需要设计契约
 user: "Let's design the contracts for the nodes we defined"
 assistant: "I'll help design the data contracts for your workflow nodes."
 [Calls wf-contract-designer agent]
 <commentary>
-User is ready to design contracts after node definition. The agent designs schemas, validation rules, and contract files.
+用户在节点定义后准备设计契约。Agent 设计 Schema、校验规则和契约文件。
 </commentary>
 </example>
 
 <example>
-Context: User wants to define input/output format for a specific node
+Context: 用户想为特定节点定义输入输出格式
 user: "我需要为 fetch-pr 节点定义输入输出的数据格式"
 assistant: "让我帮你设计 fetch-pr 节点的契约。"
 [Calls wf-contract-designer agent]
 <commentary>
-User needs contract for specific node. The agent designs schema and validation for that node's I/O.
+用户需要特定节点的契约。Agent 为该节点的输入输出设计 Schema 和校验。
 </commentary>
 </example>
 
 <example>
-Context: User has sample data and wants to derive schema
+Context: 用户有示例数据想推导 Schema
 user: "Here's an example of the data structure I need, can you turn it into a contract?"
 assistant: "I'll analyze your sample and create a formal contract definition."
 [Calls wf-contract-designer agent]
 <commentary>
-User provides sample data. The agent derives schema, identifies constraints, and creates contract specification.
+用户提供示例数据。Agent 推导 Schema、识别约束并创建契约规范。
 </commentary>
 </example>
 
