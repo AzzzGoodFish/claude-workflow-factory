@@ -1,151 +1,171 @@
+<div align="center">
+
 # CC Workflow Factory
 
-交互式工作流构建向导，帮助用户创建符合 AI 工作流设计原则的 Claude Code 标准化工作流。
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Claude Code](https://img.shields.io/badge/Claude_Code-Plugin-orange.svg)](https://claude.ai)
 
-## 功能概述
+**English | [中文](README_CN.md)**
 
-通过多轮对话，引导用户：
+<p>
+  <strong>Interactive workflow building wizard for Claude Code</strong><br>
+  <em>Create standardized AI workflows following best design principles</em>
+</p>
 
-1. **理解需求** - 分析用户提供的参考资料或进行调研
-2. **设计节点** - 识别和定义工作流节点
-3. **编排流程** - 设计执行顺序、并行、分支、错误处理
-4. **定义契约** - 设计数据结构和校验规则
-5. **生成工作流** - 输出完整的工作流目录结构
+</div>
 
-## 安装
+---
+
+## 🌟 Overview
+
+CC Workflow Factory is an interactive wizard plugin for Claude Code that guides users through creating standardized, well-structured AI workflows. Through multi-turn conversations, it helps you design robust workflows with proper contracts, nodes, and flow orchestration.
+
+## ✨ Features
+
+| Phase | Description |
+|-------|-------------|
+| 📋 **Requirement Analysis** | Analyze reference materials or conduct research |
+| 🔧 **Node Design** | Identify and define workflow nodes |
+| 🔀 **Flow Orchestration** | Design execution order, parallelism, branching, error handling |
+| 📝 **Contract Definition** | Design data structures and validation rules |
+| 🚀 **Workflow Generation** | Output complete workflow directory structure |
+
+## 📦 Installation
 
 ```bash
-# 使用 --plugin-dir 参数测试
+# Test with --plugin-dir parameter
 claude --plugin-dir /path/to/cc-wf-factory
 
-# 或复制到 Claude Code 插件目录
+# Or copy to Claude Code plugins directory
 cp -r cc-wf-factory ~/.claude/plugins/
 ```
 
-## 使用方法
+## 🚀 Usage
 
 ```bash
-# 启动工作流工厂
-/cc-wf-factory 我想创建一个代码审查工作流
+# Start workflow factory with a goal
+/cc-wf-factory I want to create a code review workflow
 
-# 或不带参数启动
+# Or start without parameters
 /cc-wf-factory
 ```
 
-## 交互流程
+## 📊 Interactive Flow
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                       迭代式工作流构建                                │
+│                    Iterative Workflow Building                       │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                      │
-│  1. 用户描述目标 / 提供参考资料                                       │
+│  1. User describes goal / provides reference materials               │
 │                                                                      │
-│  2. 分析资料 (wf-resource-analyzer)                                  │
-│     或调研建议 (wf-researcher)                                       │
+│  2. Analyze materials (wf-resource-analyzer)                         │
+│     or research suggestions (wf-researcher)                          │
 │                                                                      │
-│  3. 确认/修改节点设计                                                │
+│  3. Confirm / modify node design                                     │
 │                                                                      │
-│  4. 设计流程编排 (wf-flow-designer)                                  │
+│  4. Design flow orchestration (wf-flow-designer)                     │
 │                                                                      │
-│  5. 设计数据契约 (wf-contract-designer)                              │
+│  5. Design data contracts (wf-contract-designer)                     │
 │                                                                      │
-│  6. 生成工作流 (wf-generator)                                        │
+│  6. Generate workflow (wf-generator)                                 │
 │                                                                      │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-## 组件
+## 🧩 Components
 
 ### Commands
 
-| 名称 | 说明 |
-|------|------|
-| `cc-wf-factory` | 工作流构建向导入口 |
+| Name | Description |
+|------|-------------|
+| `cc-wf-factory` | Workflow building wizard entry point |
 
 ### Skills
 
-| 名称 | 说明 |
-|------|------|
-| `workflow-design` | 工作流设计知识（Contract、Node、Flow、Context） |
-| `resource-analysis` | 资料分析方法论，提取工作流设计要素 |
+| Name | Description |
+|------|-------------|
+| `workflow-design` | Workflow design knowledge (Contract, Node, Flow, Context) |
+| `resource-analysis` | Material analysis methodology for extracting workflow design elements |
 
 ### Agents
 
-| 名称 | 说明 |
-|------|------|
-| `wf-resource-analyzer` | 分析用户提供的参考资料 |
-| `wf-researcher` | 工作流调研，提供方案建议 |
-| `wf-contract-designer` | 设计数据契约 |
-| `wf-flow-designer` | 设计流程编排 |
-| `wf-generator` | 生成完整工作流 |
+| Name | Description |
+|------|-------------|
+| `wf-resource-analyzer` | Analyzes user-provided reference materials |
+| `wf-researcher` | Workflow research, provides solution recommendations |
+| `wf-contract-designer` | Designs data contracts |
+| `wf-flow-designer` | Designs flow orchestration |
+| `wf-generator` | Generates complete workflow |
 
 ### Hooks
 
-| 事件 | 说明 |
-|------|------|
-| `UserPromptSubmit` | 分析用户输入类型，提供上下文提示 |
+| Event | Description |
+|-------|-------------|
+| `UserPromptSubmit` | Analyzes user input type, provides contextual hints |
 
-## 生成的工作流结构
+## 📁 Generated Workflow Structure
 
 ```
 .claude/
 ├── commands/
-│   └── <workflow-name>.md           # 工作流入口
+│   └── <workflow-name>.md           # Workflow entry point
 ├── agents/
-│   └── <node-name>.md               # 节点 SubAgent
+│   └── <node-name>.md               # Node SubAgents
 ├── hooks/
-│   └── [Hook 配置]
+│   └── [Hook configurations]
 └── workflows/
     └── <workflow-name>/
         ├── flow.yaml                # Flow DSL
-        ├── contracts/               # 契约定义
-        └── validators/              # Python 校验器
+        ├── contracts/               # Contract definitions
+        └── validators/              # Python validators
 ```
 
-## 设计文档
+## 📐 Design Documents
 
-工作流设计过程中，中间文档保存在：
+During workflow design, intermediate documents are saved in:
 
 ```
 $WORKDIR/.wf-factory/
 ├── design/
-│   ├── overview.md         # 工作流概述
-│   ├── nodes.md            # 节点定义
-│   ├── flow.md             # 流程编排
-│   ├── contracts.md        # 契约定义
-│   └── validators.md       # 校验器规格
-└── resources/              # 用户参考资料
+│   ├── overview.md         # Workflow overview
+│   ├── nodes.md            # Node definitions
+│   ├── flow.md             # Flow orchestration
+│   ├── contracts.md        # Contract definitions
+│   └── validators.md       # Validator specifications
+└── resources/              # User reference materials
 ```
 
-## 基于的设计原则
+## 🎯 Design Principles
 
-本插件基于以下设计原则：
+This plugin is built on the following design principles:
 
-- **Contract (契约)** - 数据结构规范和校验
-- **Nodes (节点)** - 执行单元，由 SubAgent 实现
-- **Flow (流程)** - 执行控制规则
-- **Context (上下文)** - 环境信息和共享状态
+| Principle | Description |
+|-----------|-------------|
+| **Contract** | Data structure specifications and validation |
+| **Nodes** | Execution units implemented by SubAgents |
+| **Flow** | Execution control rules |
+| **Context** | Environment information and shared state |
 
-详见 `skills/workflow-design/references/` 目录下的参考文档。
+See reference documents in `skills/workflow-design/references/`.
 
-## Flow DSL 语法
+## 📖 Flow DSL Syntax
 
 ```yaml
-# 顺序执行
+# Sequential execution
 START >> step-a >> step-b >> END
 
-# 并行执行
+# Parallel execution
 START >> [collect-a, collect-b] >> merge >> END
 
-# 条件分支
+# Conditional branching
 analyze ?issues >> fix >> END
 analyze ?clean >> approve >> END
 
-# 循环迭代
+# Loop iteration
 processor * $items[3] >> merge >> END
 ```
 
-## 许可证
+## 📄 License
 
 MIT
