@@ -2,26 +2,20 @@
   "name": "cc-wf-factory-marketplace",
   "owner": {
     "name": "AzzzGoodFish",
-    "url": "https://github.com/AzzzGoodFish"
+    "email": "azzzgoodfish@example.com"
   },
   "plugins": [
     {
       "name": "cc-wf-factory",
-      "version": "0.1.0",
+      "source": {
+        "source": "github",
+        "repo": "AzzzGoodFish/claude-workflow-factory"
+      },
       "description": "Interactive workflow building wizard for Claude Code. Create standardized AI workflows with contracts, nodes, and flow orchestration.",
-      "license": "MIT",
-      "homepage": "https://github.com/AzzzGoodFish/claude-workflow-factory",
-      "repository": "https://github.com/AzzzGoodFish/claude-workflow-factory.git",
-      "source": "https://github.com/AzzzGoodFish/claude-workflow-factory.git",
+      "version": "0.1.0",
       "author": {
         "name": "lhy"
-      },
-      "keywords": [
-        "workflow",
-        "automation",
-        "subagent",
-        "contract"
-      ]
+      }
     }
   ]
 }
