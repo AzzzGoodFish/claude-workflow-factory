@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>代码审查工作流 DAG 可视化</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        #graph {
+            width: 100%;
+            height: 700px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .legend {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 代码审查工作流 DAG 可视化</h1>
+        <div id="graph"></div>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #90EE90;"></div>
+                <span>Start/End</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #87CEEB;"></div>
+                <span>Agent</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #FFB6C1;"></div>
+                <span>Loop</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #FFD700;"></div>
+                <span>Parallel Group</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #DDA0DD;"></div>
+                <span>Conditional</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script>
+        const dagData = {
+            "name": "code-review-workflow",
+            "nodes": [
+                {"id": "START", "type": "start"},
+                {"id": "fetch-pr", "type": "agent"},
+                {"id": "lint", "type": "agent"},
+                {"id": "test", "type": "agent"},
+                {"id": "security", "type": "agent"},
+                {"id": "analyze", "type": "agent"},
+                {"id": "generate-fixes", "type": "agent"},
+                {"id": "approve", "type": "agent"},
+                {"id": "reviewer", "type": "loop"},
+                {"id": "summarize", "type": "agent"},
+                {"id": "END", "type": "end"}
+            ],
+            "edges": [
+                {"from": "START", "to": "fetch-pr"},
+                {"from": "fetch-pr", "to": "lint", "parallel_group": "checks"},
+                {"from": "fetch-pr", "to": "test", "parallel_group": "checks"},
+                {"from": "fetch-pr", "to": "security", "parallel_group": "checks"},
+                {"from": "lint", "to": "analyze"},
+                {"from": "test", "to": "analyze"},
+                {"from": "security", "to": "analyze"},
+                {"from": "analyze", "to": "generate-fixes", "condition": "issues"},
+                {"from": "analyze", "to": "approve", "condition": "clean"},
+                {"from": "generate-fixes", "to": "END"},
+                {"from": "approve", "to": "END"},
+                {"from": "fetch-pr", "to": "reviewer"},
+                {"from": "reviewer", "to": "summarize"},
+                {"from": "summarize", "to": "END"}
+            ]
+        };
+
+        const width = document.getElementById('graph').clientWidth;
+        const height = 700;
+
+        // 手动布局位置
+        const positions = {
+            "START": {x: width/2, y: 50},
+            "fetch-pr": {x: width/2, y: 140},
+            "lint": {x: width/4 - 80, y: 250},
+            "test": {x: width/4 + 80, y: 250},
+            "security": {x: width/4 + 240, y: 250},
+            "reviewer": {x: 3*width/4, y: 250},
+            "analyze": {x: width/4 + 80, y: 360},
+            "summarize": {x: 3*width/4, y: 360},
+            "generate-fixes": {x: width/4 - 50, y: 470},
+            "approve": {x: width/4 + 210, y: 470},
+            "END": {x: width/2, y: 600}
+        };
+
+        const svg = d3.select("#graph")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        // 添加箭头标记
+        svg.append("defs").selectAll("marker")
+            .data(["arrow", "arrow-parallel", "arrow-condition"])
+            .enter().append("marker")
+            .attr("id", d => d)
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 25)
+            .attr("refY", 0)
+            .attr("markerWidth", 6)
+            .attr("markerHeight", 6)
+            .attr("orient", "auto")
+            .append("path")
+            .attr("d", "M0,-5L10,0L0,5")
+            .attr("fill", d => {
+                if (d === "arrow-parallel") return "#FF8C00";
+                if (d === "arrow-condition") return "#9370DB";
+                return "#666";
+            });
+
+        // 绘制边
+        const links = svg.append("g").selectAll("path")
+            .data(dagData.edges)
+            .enter().append("path")
+            .attr("d", d => {
+                const source = positions[d.from];
+                const target = positions[d.to];
+                return `M ${source.x} ${source.y} L ${target.x} ${target.y}`;
+            })
+            .attr("stroke", d => {
+                if (d.parallel_group) return "#FF8C00";
+                if (d.condition) return "#9370DB";
+                return "#666";
+            })
+            .attr("stroke-width", d => d.parallel_group ? 3 : 2)
+            .attr("fill", "none")
+            .attr("marker-end", d => {
+                if (d.parallel_group) return "url(#arrow-parallel)";
+                if (d.condition) return "url(#arrow-condition)";
+                return "url(#arrow)";
+            })
+            .attr("opacity", 0.7);
+
+        // 边标签
+        svg.append("g").selectAll("text")
+            .data(dagData.edges.filter(d => d.condition || d.parallel_group))
+            .enter().append("text")
+            .attr("x", d => (positions[d.from].x + positions[d.to].x) / 2)
+            .attr("y", d => (positions[d.from].y + positions[d.to].y) / 2 - 5)
+            .attr("text-anchor", "middle")
+            .attr("font-size", "11px")
+            .attr("fill", d => d.condition ? "#9370DB" : "#FF8C00")
+            .attr("font-weight", "bold")
+            .text(d => d.condition || (d.parallel_group ? "parallel" : ""));
+
+        // 绘制节点
+        const nodes = svg.append("g").selectAll("g")
+            .data(dagData.nodes)
+            .enter().append("g")
+            .attr("transform", d => `translate(${positions[d.id].x}, ${positions[d.id].y})`);
+
+        nodes.append("rect")
+            .attr("x", -60)
+            .attr("y", -25)
+            .attr("width", 120)
+            .attr("height", 50)
+            .attr("rx", 8)
+            .attr("fill", d => {
+                if (d.type === "start" || d.type === "end") return "#90EE90";
+                if (d.type === "loop") return "#FFB6C1";
+                return "#87CEEB";
+            })
+            .attr("stroke", "#333")
+            .attr("stroke-width", 2);
+
+        nodes.append("text")
+            .attr("text-anchor", "middle")
+            .attr("dy", "0.35em")
+            .attr("font-size", "13px")
+            .attr("font-weight", "bold")
+            .attr("fill", "#333")
+            .text(d => d.id);
+
+        // 特殊标注
+        nodes.filter(d => d.type === "loop")
+            .append("text")
+            .attr("text-anchor", "middle")
+            .attr("dy", "1.5em")
+            .attr("font-size", "10px")
+            .attr("fill", "#666")
+            .text("parallel: 3");
+
+    </script>
+</body>
+</html>

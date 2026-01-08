@@ -1,67 +1,41 @@
 {
-  "id": "cc-wf-factory",
-  "name": "CC Workflow Factory",
-  "version": "0.1.0",
-  "license": "MIT",
-  "homepage": "https://github.com/AzzzGoodFish/claude-workflow-factory",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/AzzzGoodFish/claude-workflow-factory.git"
+  "name": "cc-wf-factory-marketplace",
+  "owner": {
+    "name": "AzzzGoodFish",
+    "url": "https://github.com/AzzzGoodFish"
   },
-  "author": {
-    "name": "lhy"
-  },
-  "description": {
-    "en": "Interactive workflow building wizard for Claude Code. Create standardized, well-structured AI workflows following best design principles with proper contracts, nodes, and flow orchestration.",
-    "zh": "Claude Code 交互式工作流构建向导。通过遵循最佳设计原则，创建具有完善契约、节点和流程编排的标准化 AI 工作流。"
-  },
-  "shortDescription": {
-    "en": "Build standardized AI workflows interactively",
-    "zh": "交互式工作流构建向导"
-  },
-  "keywords": [
-    "workflow",
-    "ai-workflow",
-    "automation",
-    "subagent",
-    "contract",
-    "flow-orchestration",
-    "factory"
-  ],
-  "categories": [
-    "workflow-automation",
-    "development-tools",
-    "code-generation"
-  ],
-  "features": [
+  "plugins": [
     {
-      "name": "Requirement Analysis",
-      "description": "Analyze reference materials or conduct research"
-    },
-    {
-      "name": "Node Design",
-      "description": "Identify and define workflow nodes"
-    },
-    {
-      "name": "Flow Orchestration",
-      "description": "Design execution order, parallelism, branching, error handling"
-    },
-    {
-      "name": "Contract Definition",
-      "description": "Design data structures and validation rules"
-    },
-    {
-      "name": "Workflow Generation",
-      "description": "Output complete workflow directory structure"
+      "id": "cc-wf-factory",
+      "name": "CC Workflow Factory",
+      "version": "0.1.0",
+      "license": "MIT",
+      "homepage": "https://github.com/AzzzGoodFish/claude-workflow-factory",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/AzzzGoodFish/claude-workflow-factory.git"
+      },
+      "author": {
+        "name": "lhy"
+      },
+      "description": {
+        "en": "Interactive workflow building wizard for Claude Code",
+        "zh": "Claude Code 交互式工作流构建向导"
+      },
+      "shortDescription": {
+        "en": "Build standardized AI workflows interactively",
+        "zh": "交互式工作流构建向导"
+      },
+      "keywords": [
+        "workflow",
+        "automation",
+        "subagent",
+        "contract"
+      ],
+      "categories": [
+        "workflow-automation",
+        "development-tools"
+      ]
     }
-  ],
-  "requirements": {
-    "minClaudeCodeVersion": "0.1.0"
-  },
-  "components": {
-    "commands": 1,
-    "skills": 2,
-    "agents": 5,
-    "hooks": 1
-  }
+  ]
 }
