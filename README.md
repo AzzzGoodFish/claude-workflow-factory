@@ -8,164 +8,127 @@
 **English | [中文](README_CN.md)**
 
 <p>
-  <strong>Interactive workflow building wizard for Claude Code</strong><br>
-  <em>Create standardized AI workflows following best design principles</em>
+  <strong>Claude Code Workflow Factory</strong><br>
+  <em>Transform workflow requirements into Claude Code implementations</em>
 </p>
 
 </div>
 
 ---
 
-## 🌟 Overview
+## Overview
 
-CC Workflow Factory is an interactive wizard plugin for Claude Code that guides users through creating standardized, well-structured AI workflows. Through multi-turn conversations, it helps you design robust workflows with proper contracts, nodes, and flow orchestration.
+CC Workflow Factory is a Claude Code plugin that transforms user workflow requirements into standardized Claude Code implementations. Through an interactive 7-phase process, it generates complete workflow components including Skills, Agents, Commands, and Hooks.
 
-## ✨ Features
+## Features
 
 | Phase | Description |
 |-------|-------------|
-| 📋 **Requirement Analysis** | Analyze reference materials or conduct research |
-| 🔧 **Node Design** | Identify and define workflow nodes |
-| 🔀 **Flow Orchestration** | Design execution order, parallelism, branching, error handling |
-| 📝 **Contract Definition** | Design data structures and validation rules |
-| 🚀 **Workflow Generation** | Output complete workflow directory structure |
+| 1. **Initialize** | Parse workflow description, create design document structure |
+| 2. **Requirements** | Analyze requirements, identify workflow elements |
+| 3. **Skills** | Design and create workflow skills |
+| 4. **Nodes** | Design workflow nodes and their contracts |
+| 5. **Contracts** | Generate contract schemas and validators |
+| 6. **Flow** | Design flow orchestration, create entry command |
+| 7. **Build & Verify** | Generate settings.json, validate all components |
 
-## 📦 Installation
+## Installation
 
 ```bash
 # Test with --plugin-dir parameter
-claude --plugin-dir /path/to/cc-wf-factory
+claude --plugin-dir /path/to/cc-wf-factory/.claude-plugin
 
 # Or copy to Claude Code plugins directory
-cp -r cc-wf-factory ~/.claude/plugins/
+cp -r cc-wf-factory/.claude-plugin ~/.claude/plugins/cc-wf-factory
 ```
 
-## 🚀 Usage
+## Usage
 
 ```bash
-# Start workflow factory with a goal
-/cc-wf-factory I want to create a code review workflow
+# Create a new workflow (interactive)
+/create-cc-wf
 
-# Or start without parameters
-/cc-wf-factory
+# Create with description
+/create-cc-wf I want to create a code review workflow
+
+# Review an existing workflow
+/review-cc-wf ./my-workflow --mode structure
+/review-cc-wf ./my-workflow --mode function
+/review-cc-wf ./my-workflow --mode runtime --log ./logs/
 ```
 
-## 📊 Interactive Flow
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    Iterative Workflow Building                       │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                      │
-│  1. User describes goal / provides reference materials               │
-│                                                                      │
-│  2. Analyze materials (wf-resource-analyzer)                         │
-│     or research suggestions (wf-researcher)                          │
-│                                                                      │
-│  3. Confirm / modify node design                                     │
-│                                                                      │
-│  4. Design flow orchestration (wf-flow-designer)                     │
-│                                                                      │
-│  5. Design data contracts (wf-contract-designer)                     │
-│                                                                      │
-│  6. Generate workflow (wf-generator)                                 │
-│                                                                      │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
-## 🧩 Components
+## Components
 
 ### Commands
 
 | Name | Description |
 |------|-------------|
-| `cc-wf-factory` | Workflow building wizard entry point |
+| `create-cc-wf` | Interactive workflow creation wizard |
+| `review-cc-wf` | Workflow validation (structure/function/runtime) |
 
-### Skills
-
-| Name | Description |
-|------|-------------|
-| `workflow-design` | Workflow design knowledge (Contract, Node, Flow, Context) |
-| `resource-analysis` | Material analysis methodology for extracting workflow design elements |
-
-### Agents
+### Agents (Builders)
 
 | Name | Description |
 |------|-------------|
-| `wf-resource-analyzer` | Analyzes user-provided reference materials |
-| `wf-researcher` | Workflow research, provides solution recommendations |
-| `wf-contract-designer` | Designs data contracts |
-| `wf-flow-designer` | Designs flow orchestration |
-| `wf-generator` | Generates complete workflow |
+| `skill-builder` | Creates Skill components from design documents |
+| `contract-builder` | Creates Contract schemas and documentation |
+| `node-builder` | Creates workflow Node agents |
+| `wf-entry-builder` | Creates workflow entry Commands |
+| `cc-settings-builder` | Generates settings.json configuration |
 
-### Hooks
+### Hook Templates
 
-| Event | Description |
-|-------|-------------|
-| `UserPromptSubmit` | Analyzes user input type, provides contextual hints |
+| Name | Description |
+|------|-------------|
+| `contract-validator.py` | Validates node inputs/outputs against contracts |
+| `wf-state.py` | Manages workflow execution state |
 
-## 📁 Generated Workflow Structure
-
-```
-.claude/
-├── commands/
-│   └── <workflow-name>.md           # Workflow entry point
-├── agents/
-│   └── <node-name>.md               # Node SubAgents
-├── hooks/
-│   └── [Hook configurations]
-└── workflows/
-    └── <workflow-name>/
-        ├── flow.yaml                # Flow DSL
-        ├── contracts/               # Contract definitions
-        └── validators/              # Python validators
-```
-
-## 📐 Design Documents
-
-During workflow design, intermediate documents are saved in:
+## Generated Workflow Structure
 
 ```
-$WORKDIR/.wf-factory/
-├── design/
-│   ├── overview.md         # Workflow overview
-│   ├── nodes.md            # Node definitions
-│   ├── flow.md             # Flow orchestration
-│   ├── contracts.md        # Contract definitions
-│   └── validators.md       # Validator specifications
-└── resources/              # User reference materials
+target-project/
+├── .claude/
+│   ├── commands/
+│   │   └── <workflow-name>.md      # Workflow entry command
+│   ├── agents/
+│   │   └── <node-name>.md          # Node agents
+│   ├── skills/
+│   │   └── <skill-name>/           # Workflow skills
+│   ├── contracts/
+│   │   ├── <contract>.yaml         # Contract schemas
+│   │   └── mapping.yaml            # Node-contract mapping
+│   └── hooks/
+│       ├── contract-validator.py   # Contract validation
+│       └── wf-state.py             # State management
+├── .context/
+│   └── state.md                    # Runtime state file
+└── settings.json                   # Claude Code settings
 ```
 
-## 🎯 Design Principles
+## Workflow Abstraction
 
-This plugin is built on the following design principles:
+This plugin maps workflow concepts to Claude Code components:
 
-| Principle | Description |
-|-----------|-------------|
-| **Contract** | Data structure specifications and validation |
-| **Nodes** | Execution units implemented by SubAgents |
-| **Flow** | Execution control rules |
-| **Context** | Environment information and shared state |
+| Workflow Concept | Claude Code Implementation |
+|------------------|---------------------------|
+| **Skill** | `.claude/skills/*/SKILL.md` |
+| **Contract** | `.claude/contracts/*.yaml` + Hook |
+| **Context** | `.context/` filesystem |
+| **Node** | `.claude/agents/*.md` (Subagent) |
+| **Flow** | `.claude/commands/*.md` (Command) |
 
-See reference documents in `skills/workflow-design/references/`.
+## Design Documents
 
-## 📖 Flow DSL Syntax
+During workflow creation, design documents are generated in:
 
-```yaml
-# Sequential execution
-START >> step-a >> step-b >> END
-
-# Parallel execution
-START >> [collect-a, collect-b] >> merge >> END
-
-# Conditional branching
-analyze ?issues >> fix >> END
-analyze ?clean >> approve >> END
-
-# Loop iteration
-processor * $items[3] >> merge >> END
+```
+target-project/.wf-design/
+├── skills.yaml       # Skill definitions
+├── nodes.yaml        # Node definitions
+├── contracts.yaml    # Contract definitions
+└── flow.yaml         # Flow orchestration
 ```
 
-## 📄 License
+## License
 
 MIT
