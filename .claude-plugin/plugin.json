@@ -1,0 +1,8 @@
+{
+  "name": "cc-wf-factory",
+  "version": "0.1.0",
+  "description": "Claude Code Workflow Factory - 将用户工作流需求映射为 Claude Code 实现",
+  "author": {
+    "name": "cc-wf-factory"
+  }
+}
