@@ -1,0 +1,22 @@
+# Simple Contract Example
+name: SimpleTaskContract
+version: "1.0"
+description: Basic contract for task input validation
+
+schema:
+  type: object
+  required:
+    - task_id
+    - action
+  properties:
+    task_id:
+      type: string
+      description: Unique task identifier
+      pattern: "^[A-Z]+-[0-9]+$"
+    action:
+      type: string
+      description: Action to perform
+      enum: ["create", "read", "update", "delete"]
+    data:
+      type: object
+      description: Optional payload data

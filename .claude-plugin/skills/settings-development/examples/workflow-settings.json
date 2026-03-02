@@ -1,0 +1,71 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 .claude/hooks/*)",
+      "Bash(npm run test:*)",
+      "Bash(npm run lint)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)"
+    ]
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/wf-state.py --event UserPromptSubmit"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/contract-validator.py --event PreToolUse"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/wf-state.py --event PostToolUse"
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/contract-validator.py --event PostToolUse"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/wf-state.py --event Stop"
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/contract-validator.py --event Stop"
+          }
+        ]
+      }
+    ]
+  },
+  "env": {
+    "WF_STATE_FILE": ".context/state.yaml"
+  }
+}

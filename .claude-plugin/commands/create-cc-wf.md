@@ -34,8 +34,8 @@ allowed-tools:
 2. 使用 TodoWrite 创建阶段任务列表：
    - 阶段 1: 需求分析
    - 阶段 2: 技能设计
-   - 阶段 3: 节点设计
-   - 阶段 4: 契约设计
+   - 阶段 3: 契约设计
+   - 阶段 4: 节点设计
    - 阶段 5: 流程设计
    - 阶段 6: 组件创建
    - 阶段 7: 验证测试（可选）
@@ -163,91 +163,13 @@ skills_count: {N}
 
 ---
 
-### 阶段 3: 节点设计
-
-**目标**：定义工作流的执行节点
-
-**步骤**：
-
-1. 基于需求和技能，拆解工作流步骤
-
-2. 对于每个节点，设计：
-   - 节点名称和职责
-   - 输入输出
-   - 绑定的技能
-   - 所需工具
-   - 触发示例
-
-3. 绘制数据流图
-
-4. 生成节点设计文档并写入 `.context/design/02-nodes-design.md`：
-
-```markdown
----
-type: nodes-design
-workflow: {workflow-name}
-version: 1.0
-nodes_count: {K}
----
-
-# 节点设计
-
-## 概述
-本工作流包含 {K} 个节点...
-
-## 数据流图
-```
-{input} → [node-1] → {output-1} → [node-2] → ... → {final-output}
-```
-
----
-
-## Node: {node-name-1}
-
-### 基本信息
-- **名称**: {node-name}
-- **职责**: {responsibility}
-- **模型**: inherit
-
-### 输入输出
-- **输入**: {input-description}
-- **输出**: {output-path}
-- **输入契约**: {input-contract-name}
-- **输出契约**: {output-contract-name}
-
-### 绑定技能
-- @skills/{skill-name}
-
-### 工具需求
-- {tool-1}
-- {tool-2}
-
-### 触发示例
-<example>
-Context: {context}
-user: "{user-request}"
-assistant: "{response}"
-</example>
-
----
-
-## Node: {node-name-2}
-...
-```
-
-5. 展示文档给用户确认
-
-6. 用户确认后，标记阶段 3 完成，进入阶段 4
-
----
-
-### 阶段 4: 契约设计
+### 阶段 3: 契约设计
 
 **目标**：定义节点间的数据规范
 
 **步骤**：
 
-1. 基于节点设计，识别需要契约的数据点
+1. 基于需求和技能设计，识别需要契约的数据点
 
 2. 对于每个契约，设计：
    - 契约名称和用途
@@ -255,7 +177,7 @@ assistant: "{response}"
    - 示例数据（正例和反例）
    - 校验时机
 
-3. 生成契约设计文档并写入 `.context/design/03-contracts-design.md`：
+3. 生成契约设计文档并写入 `.context/design/02-contracts-design.md`：
 
 ```markdown
 ---
@@ -319,7 +241,85 @@ properties:
 
 4. 展示文档给用户确认
 
-5. 用户确认后，标记阶段 4 完成，进入阶段 5
+5. 用户确认后，标记阶段 3 完成，进入阶段 4
+
+---
+
+### 阶段 4: 节点设计
+
+**目标**：定义工作流的执行节点
+
+**步骤**：
+
+1. 基于需求、技能和契约，拆解工作流步骤
+
+2. 对于每个节点，设计：
+   - 节点名称和职责
+   - 输入输出
+   - 绑定的技能
+   - 所需工具
+   - 触发示例
+
+3. 绘制数据流图
+
+4. 生成节点设计文档并写入 `.context/design/03-nodes-design.md`：
+
+```markdown
+---
+type: nodes-design
+workflow: {workflow-name}
+version: 1.0
+nodes_count: {K}
+---
+
+# 节点设计
+
+## 概述
+本工作流包含 {K} 个节点...
+
+## 数据流图
+```
+{input} → [node-1] → {output-1} → [node-2] → ... → {final-output}
+```
+
+---
+
+## Node: {node-name-1}
+
+### 基本信息
+- **名称**: {node-name}
+- **职责**: {responsibility}
+- **模型**: inherit
+
+### 输入输出
+- **输入**: {input-description}
+- **输出**: {output-path}
+- **输入契约**: {input-contract-name}
+- **输出契约**: {output-contract-name}
+
+### 绑定技能
+- @skills/{skill-name}
+
+### 工具需求
+- {tool-1}
+- {tool-2}
+
+### 触发示例
+<example>
+Context: {context}
+user: "{user-request}"
+assistant: "{response}"
+</example>
+
+---
+
+## Node: {node-name-2}
+...
+```
+
+5. 展示文档给用户确认
+
+6. 用户确认后，标记阶段 4 完成，进入阶段 5
 
 ---
 
@@ -413,14 +413,14 @@ version: 1.0
    Task(skill-builder, prompt="根据以下设计创建技能：\n\n{skill-section}")
    ```
 
-   读取 `03-contracts-design.md`，解析每个契约章节，并发调用 contract-builder：
+   读取 `02-contracts-design.md`，解析每个契约章节，并发调用 contract-builder：
    ```
    Task(contract-builder, prompt="根据以下设计创建契约：\n\n{contract-section}")
    ```
 
 3. **第二批：并发创建节点**
 
-   等待第一批完成后，读取 `02-nodes-design.md`，解析每个节点章节，并发调用 node-builder：
+   等待第一批完成后，读取 `03-nodes-design.md`，解析每个节点章节，并发调用 node-builder：
    ```
    Task(node-builder, prompt="根据以下设计创建节点：\n\n{node-section}")
    ```

@@ -167,7 +167,7 @@ allowed-tools:
 4. **契约匹配检查**
    - 从节点设计中提取输入/输出契约引用
    - 检查 `{workflow-dir}/contracts/` 中是否存在
-   - 检查 `contracts/mapping.yaml` 配置是否完整
+   - 检查节点 frontmatter 中的 `output_contract` 配置
    - 报告缺失或配置错误的契约
 
 5. **流程完整性检查**
